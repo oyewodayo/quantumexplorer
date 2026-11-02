@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import AppHeader from './components/AppHeader.jsx';
-import AppSidebarMarkup from './components/generated/AppSidebarMarkup.jsx';
+import Sidebar from './components/Sidebar.jsx';
 import IntroductionTab from './components/generated/IntroductionTab.jsx';
 import ImportantConceptsTab from './components/generated/ImportantConceptsTab.jsx';
 import QubitTab from './components/generated/QubitTab.jsx';
@@ -31,7 +31,7 @@ export default function App() {
   return (
     <>
       <AppHeader />
-      <AppSidebarMarkup />
+      <Sidebar />
       <IntroductionTab />
       <ImportantConceptsTab />
       <QubitTab />

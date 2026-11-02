@@ -6,6 +6,8 @@ import { Qubit, round2, blochVectorLabel } from '../core/qubit.js';
 import { TwoQubitState } from '../core/twoQubit.js';
 import { ThreeQubitState } from '../core/threeQubit.js';
 import { TunnelSolver, TUNNEL_N } from '../core/tunnelSolver.js';
+import { SIDEBAR_ITEMS } from '../components/sidebarItems.js';
+import { setNav, setTabSub, engineApi } from '../state/nav.js';
 import { t, applyTranslations, onLangChange } from '../i18n/index.js';
 import { isDark, BLOCH_COLORS, onThemeChange, refreshThemeColors } from '../core/theme.js';
 import { noiseT2Eff as noiseT2EffOf, noiseCompute as noiseComputeAt } from '../core/noise.js';
@@ -5691,7 +5693,7 @@ let roadmapProgress = loadRoadmapProgress();
 function setAppMode(mode) {
   document.querySelectorAll('.mode-btn[data-app-mode]').forEach(b =>
     b.classList.toggle('active', b.dataset.appMode === mode));
-  document.getElementById('tab-sidebar').style.display = mode === 'sim' ? '' : 'none';
+  setNav({ mode });
   document.querySelectorAll('.tab-content').forEach(s => { s.style.display = mode === 'sim' ? '' : 'none'; });
   document.getElementById('roadmap-view').classList.toggle('active', mode === 'roadmap');
   // Both the mind-map and #roadmap-progress-panel sit at display:none
@@ -6691,35 +6693,30 @@ let entangleCounts = { '00': 0, '11': 0 };
  *  state), and an every()-over-all-keys match used to silently fail
  *  forever because `state.i18n` is never set — no sidebar sub-link ever
  *  highlighted, on any tab, once i18n.js started tagging these buttons. */
-const SIDEBAR_SUB_MODE_KEYS = ['qubitMode', 'qubitSubmode', 'gatesDomain', 'mathsSection'];
+/** Records a tab's current mode so the React sidebar can highlight the
+ *  matching sub-link. */
 function syncSidebarSub(tab, state) {
-  document.querySelectorAll(`.tab-sub[data-tab="${tab}"]`).forEach(btn => {
-    const keys = SIDEBAR_SUB_MODE_KEYS.filter(k => btn.dataset[k] !== undefined);
-    const match = keys.length > 0 && keys.every(k => btn.dataset[k] === state[k]);
-    btn.classList.toggle('active', match);
-  });
+  setTabSub(tab, state);
 }
 
-/** Opens one sidebar subnav group (Bits & Qubits / Maths Concept / Gates),
- *  closing every other open one first — an accordion, so the dock never
- *  shows two expanded groups (and their sub-lists) at once. */
-function openSidebarGroup(group) {
-  document.querySelectorAll('.tab-group.open').forEach(g => {
-    if (g !== group) g.classList.remove('open');
-  });
-  group.classList.add('open');
+/** Applies the mode a sidebar sub-link selects. */
+function applySidebarSub(mode) {
+  if (mode.qubitMode)     setQubitMode(mode.qubitMode);
+  if (mode.qubitSubmode)  setQubitSubmode(mode.qubitSubmode);
+  if (mode.gatesDomain)   setGatesDomain(mode.gatesDomain);
+  if (mode.mathsSection)  setMathsSection(mode.mathsSection);
 }
 
 /** Switches the visible tab and fires the outgoing/incoming tab's
  *  registerTab() hooks (see core/tab-registry.js). */
 function switchToTab(name) {
-  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
   document.querySelectorAll('.tab-content').forEach(s => s.classList.toggle('active', s.id === `tab-${name}`));
 
   const leaving = TABS[currentTab];
   if (leaving && leaving.onLeave) leaving.onLeave();
 
   currentTab = name;
+  setNav({ tab: name });
   const entering = TABS[currentTab];
   if (entering && entering.onEnter) entering.onEnter();
 
@@ -6777,40 +6774,9 @@ export function startEngine() {
   // has already registered itself (script order in index.html), so every
   // language is available the first time applyTranslations() runs.
 
-  // Tab switching — each tab declares its own onEnter/onLeave via
-  // registerTab() (see core/tab-registry.js), so this handler never needs
-  // to know which tabs care about being entered/left, or why. Adding a
-  // new tab means calling registerTab() once in its own file, not editing
-  // this switch.
-  document.querySelectorAll('.tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      switchToTab(btn.dataset.tab);
-      const group = btn.closest('.tab-group');
-      if (group) openSidebarGroup(group);
-    });
-  });
-
-  // Sidebar sub-links (Bits & Qubits / Maths Concept / Gates) — each
-  // carries `data-tab` plus whichever mode/domain/section attribute its
-  // target tab understands, mirroring the same fields goToLessonSimulation()
-  // in roadmap.js applies for mind-map navigation.
-  document.querySelectorAll('.tab-chevron').forEach(chevron => {
-    chevron.addEventListener('click', e => {
-      e.stopPropagation();
-      const group = chevron.closest('.tab-group');
-      if (group.classList.contains('open')) group.classList.remove('open');
-      else openSidebarGroup(group);
-    });
-  });
-  document.querySelectorAll('.tab-sub').forEach(btn => {
-    btn.addEventListener('click', () => {
-      switchToTab(btn.dataset.tab);
-      if (btn.dataset.qubitMode)     setQubitMode(btn.dataset.qubitMode);
-      if (btn.dataset.qubitSubmode)  setQubitSubmode(btn.dataset.qubitSubmode);
-      if (btn.dataset.gatesDomain)   setGatesDomain(btn.dataset.gatesDomain);
-      if (btn.dataset.mathsSection)  setMathsSection(btn.dataset.mathsSection);
-    });
-  });
+  // The sidebar is a React component; it drives the engine through this API.
+  engineApi.switchToTab = switchToTab;
+  engineApi.applySub = applySidebarSub;
 
   // Bloch renderers — must exist before the initXTab() calls below: e.g.
   // initCircuit2Tab()/initCircuit3Tab() (tabs/circuit-multiqubit-tab.js)
@@ -6917,6 +6883,8 @@ export function startEngine() {
  *  URL by copyShareLink() (see core/dom-utils.js), so a shared link
  *  reproduces what the sender saw. Unrecognized/missing params are
  *  silently ignored rather than treated as errors. */
+const SIDEBAR_TAB_IDS = new Set(SIDEBAR_ITEMS.map((i) => i.tab));
+
 // Captured before setAppMode()/switchToTab() rewrite the address bar.
 const INITIAL_SEARCH = location.search;
 
@@ -6937,13 +6905,12 @@ function applySharedStateFromURL() {
   }
 
   const tab = params.get('tab');
-  if (tab && document.querySelector(`.tab[data-tab="${tab}"]`)) {
+  if (tab && SIDEBAR_TAB_IDS.has(tab)) {
     // A shared link lands inside the simulation, not on the Home map, and
     // skips the first-visit tour so the recipient sees what was shared.
     setAppMode('sim');
     switchToTab(tab);
-    const group = document.querySelector(`.tab[data-tab="${tab}"]`).closest('.tab-group');
-    if (group) openSidebarGroup(group);
+    setNav({ openGroup: tab });
     try { history.replaceState(null, '', location.pathname + INITIAL_SEARCH); } catch (e) { /* sandboxed */ }
     return true;
   }
