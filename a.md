@@ -15,8 +15,8 @@ Goal: replace `src/engine/engine.js` (about 12,000 lines of code that edits the 
 - [~] 1.2b Remaining pure physics: noise decay and interference done (`src/core/noise.js`, `interference.js`, tested); Grover, teleport and superdense logic still tangled with the page code
 - [x] 1.2c Theme state and the Bloch renderer moved into ES modules (`src/core/theme.js`, `blochRenderer.js`)
 - [ ] 1.3 Shared React `BlochSphere` component
-- [ ] 1.4 Shared hooks: theme, language (i18n), tab routing, saved progress
-- [ ] 1.5 App shell in React: header, sidebar, footer, theme and language switchers
+- [~] 1.4 Shared hooks: theme and language done (`useTheme`, `useI18n`, `src/i18n/`); tab routing and saved progress still to do
+- [~] 1.5 App shell in React: header (with working language and theme switchers) and footer done; sidebar and Home/Concepts toggle still run in the engine
 - [ ] 1.6 Convert the tabs one by one (each: component + state, then delete its code from the engine):
   - [ ] Measure
   - [ ] Noise
@@ -40,7 +40,7 @@ Goal: replace `src/engine/engine.js` (about 12,000 lines of code that edits the 
 
 ## 2. Code splitting and load time  `[ ]`
 
-- [ ] Load only the selected language
+- [x] Load only the selected language (French and Spanish are now separate downloads; main bundle 1 MB to 770 KB)
 - [ ] Lazy-load each tab with `React.lazy`
 
 ## 3. Content and teaching  `[ ]`

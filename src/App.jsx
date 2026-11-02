@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import AppHeader from './components/generated/AppHeader.jsx';
+import AppHeader from './components/AppHeader.jsx';
 import AppSidebarMarkup from './components/generated/AppSidebarMarkup.jsx';
 import IntroductionTab from './components/generated/IntroductionTab.jsx';
 import ImportantConceptsTab from './components/generated/ImportantConceptsTab.jsx';
@@ -19,11 +19,15 @@ import SuperdenseTab from './components/generated/SuperdenseTab.jsx';
 import NoiseTab from './components/generated/NoiseTab.jsx';
 import GroverTab from './components/generated/GroverTab.jsx';
 import RoadmapViewMarkup from './components/generated/RoadmapViewMarkup.jsx';
-import AppFooterMarkup from './components/generated/AppFooterMarkup.jsx';
+import AppFooter from './components/AppFooter.jsx';
 import { startEngine } from './engine/engine.js';
+import { initI18n } from './i18n/index.js';
 
 export default function App() {
-  useEffect(() => { startEngine(); }, []);
+  useEffect(() => {
+    // Load the saved language first so the engine's first render is translated.
+    initI18n().then(startEngine);
+  }, []);
   return (
     <>
       <AppHeader />
@@ -46,7 +50,7 @@ export default function App() {
       <NoiseTab />
       <GroverTab />
       <RoadmapViewMarkup />
-      <AppFooterMarkup />
+      <AppFooter />
     </>
   );
 }

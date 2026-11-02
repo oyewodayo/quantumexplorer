@@ -1,23 +1,21 @@
-// No file dependencies at load time. Theme-sensitive tabs/app.js register
-// their own redraw via onThemeChange() below (called during their own init,
-// which always runs inside DOMContentLoaded before toggleTheme() could ever
-// fire from a user click) — this file never needs to know which tabs exist
-// or what they draw, the same registration pattern core/tab-registry.js
-// uses for onEnter/onLeave.
+// Theme state. Canvas-drawing code reads `isDark` and `BLOCH_COLORS` (live
+// bindings) at draw time and registers a redraw with onThemeChange().
+// React components use the useTheme() hook, which subscribes the same way.
 
-// ─── THEME SYSTEM ────────────────────────────────────────────────────
 export const THEME_STORAGE_KEY = 'qe-theme';
 
 export let isDark = false;
 export let BLOCH_COLORS = {};
 
-// ─── THEME-CHANGE CALLBACKS ────────────────────────────────────────────
-// Anything that draws with theme-dependent colors (a canvas, mainly)
-// registers a redraw callback here instead of this file calling into
-// tab-specific draw functions/state by name.
-const themeChangeCallbacks = [];
-export function onThemeChange(fn) { themeChangeCallbacks.push(fn); }
+const themeChangeCallbacks = new Set();
 
+/** Registers a callback fired after every theme change; returns an unsubscribe. */
+export function onThemeChange(fn) {
+  themeChangeCallbacks.add(fn);
+  return () => themeChangeCallbacks.delete(fn);
+}
+
+/** Re-reads the theme from <html data-theme> and the CSS color tokens. */
 export function refreshThemeColors() {
   isDark = document.documentElement.getAttribute('data-theme') !== 'light';
   const s = getComputedStyle(document.documentElement);
@@ -35,21 +33,11 @@ export function refreshThemeColors() {
   };
 }
 
-// Sets the header icon to match whatever data-theme is currently active
-// (called once on load, after the inline anti-flash script in <head> has
-// already applied any saved preference — see index.html).
-export function syncThemeIcon() {
-  const dark = document.documentElement.getAttribute('data-theme') !== 'light';
-  document.getElementById('theme-icon').textContent = dark ? '☀' : '☾';
-}
-
 export function toggleTheme() {
   const root = document.documentElement;
-  isDark = root.getAttribute('data-theme') !== 'light';
-  const newTheme = isDark ? 'light' : 'dark';
-  root.setAttribute('data-theme', newTheme);
-  localStorage.setItem(THEME_STORAGE_KEY, newTheme);
-  document.getElementById('theme-icon').textContent = isDark ? '☾' : '☀';
+  const next = root.getAttribute('data-theme') !== 'light' ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_STORAGE_KEY, next); } catch { /* private mode */ }
   refreshThemeColors();
   themeChangeCallbacks.forEach(fn => fn());
 }
