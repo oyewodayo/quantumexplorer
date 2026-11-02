@@ -1,6 +1,6 @@
 # Quantum Explorer
 
-An interactive quantum computing and quantum mechanics learning app.
+An interactive quantum computing, quantum mechanics and quantum information learning platform.
 
 ## Getting started
 
