@@ -1,0 +1,79 @@
+/* Cross-cutting breakpoint overrides that predate the per-component/per-
+   tab split above — touches selectors defined across several other
+   files (compare layout, circuit grid, header, tab dock, gate/preset
+   grids, roadmap badge). MUST be linked last in index.html: CSS
+   cascade order is by position in the merged stylesheet regardless of
+   which file a rule lives in, so loading this after every other css/*
+   file is what makes these overrides win. (Tabs added after this file
+   was split out — Entangle, Tunnel, Beam Splitter, Interference — keep
+   their own responsive tweaks colocated in their own css/tabs/*.css
+   file instead of being added here; this file is intentionally not
+   growing further.) */
+
+@media (max-width: 920px) {
+  .compare-layout { grid-template-columns: 1fr; }
+  .compare-col { padding: 0; }
+  .compare-divider {
+    flex-direction: row;
+    min-height: auto;
+    padding: 20px 0;
+  }
+  .divider-line { flex: 1; height: 1px; width: auto; }
+  .divider-vs { writing-mode: horizontal-tb; }
+  .layout-two { grid-template-columns: 1fr; }
+  .gates-layout { grid-template-columns: 1fr; max-width: 100%; }
+}
+
+@media (max-width: 760px) {
+  .circuit-top { grid-template-columns: 1fr; }
+  .measure-main-card { flex-direction: column; }
+  header { padding: 0 12px; gap: 10px; }
+  .header-tag { display: none; }
+  /* The floating dock collapses into a horizontal, horizontally-
+     scrollable strip pinned under the header (same overflow-x:auto +
+     hidden-scrollbar technique the old header <nav> used) instead of a
+     vertical column. .tab-content's own top padding below accounts for
+     this strip's height so content never starts underneath it. */
+  #tab-sidebar {
+    top: var(--header-h);
+    left: 0; right: 0;
+    transform: none;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    height: var(--tab-strip-h);
+    padding: 6px 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    /* Visible, same reasoning as the desktop vertical dock in layout.css
+       — a hidden scrollbar gave no cue that the strip scrolls at all. */
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+  }
+  #tab-sidebar::-webkit-scrollbar { height: 6px; }
+  #tab-sidebar::-webkit-scrollbar-track { background: transparent; }
+  #tab-sidebar::-webkit-scrollbar-thumb {
+    background: var(--border2);
+    border-radius: 3px;
+  }
+  #tab-sidebar::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+  #tab-sidebar::before { display: none; }
+  #tab-sidebar .tab { flex-shrink: 0; }
+  #tab-sidebar .tab-label { padding-right: 14px; }
+  /* No room for a nested tree in a horizontal strip — collapse each
+     .tab-group down to just its pill (display:contents drops the
+     wrapper from layout but keeps the pill as a direct flex-row item)
+     and hide the subnav/chevron entirely; sub-destinations stay
+     reachable through each tab's own in-page toggle instead. */
+  .tab-group { display: contents; }
+  .tab-subnav, .tab-chevron { display: none !important; }
+  .tab-content { padding: calc(var(--header-h) + var(--tab-strip-h) + 16px) 14px 24px; }
+  .gate-grid { grid-template-columns: repeat(2, 1fr); }
+  .preset-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  /* Reclaims space for the scrollable tab nav — see .roadmap-badge-count. */
+  .roadmap-badge-count { display: none; }
+  .app-mode-grid { max-width: 180px; }
+}

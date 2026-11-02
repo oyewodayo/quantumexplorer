@@ -1,0 +1,144 @@
+/* Important Concepts tab — the search bar (initImportantConceptsSearch())
+   and the card-zoom overlay (initImportantConceptsZoom()/openConceptZoom()),
+   both in js/tabs/important-concepts.js. The zoom overlay follows the same
+   fixed-backdrop convention as .confirm-modal-backdrop in components.css
+   and .tour-backdrop in tour.css, just with a FLIP transform driving the
+   transition instead of a plain scale/opacity fade, so it visibly grows
+   out of the clicked card instead of appearing generically centered.
+   Depends on: ../base.css (theme variables), ../components.css (.card,
+   .card-title, .bit-explainer — the overlay reuses the clicked card's own
+   innerHTML verbatim). */
+
+/* ─── SEARCH BAR ─────────────────────────────────────── */
+.concept-search-wrap {
+  position: relative;
+  max-width: 460px;
+  margin: 0 auto 24px;
+}
+.concept-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--text3);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.concept-search-input {
+  width: 100%;
+  padding: 11px 40px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.92rem;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.concept-search-input::placeholder { color: var(--text3); }
+.concept-search-input:focus {
+  outline: none;
+  border-color: var(--zero);
+  box-shadow: 0 0 0 3px var(--zero-dim);
+}
+/* The browser's own native clear-x (WebKit's search-cancel-button, Edge's
+   clear-button) is styled inconsistently across browsers and sits under
+   our own SVG icon's mirror position — .concept-search-clear replaces it
+   with one that matches the rest of the app instead. */
+.concept-search-input::-webkit-search-cancel-button { display: none; }
+.concept-search-input::-ms-clear { display: none; }
+
+.concept-search-clear {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.concept-search-clear:hover { background: var(--accent-dim); color: var(--text); }
+
+.concept-search-empty {
+  text-align: center;
+  color: var(--text2);
+  font-size: 0.9rem;
+  padding: 10px 0 26px;
+}
+
+/* Applied by initImportantConceptsSearch() to non-matching cards and to
+   any .section-label/.intro-glossary-grid left with zero matches. */
+.concept-hidden { display: none !important; }
+
+.concept-zoom-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+.concept-zoom-backdrop.visible { opacity: 1; }
+
+.concept-zoom-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 30px 32px;
+  max-width: 640px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.32s cubic-bezier(0.22, 0.9, 0.3, 1), opacity 0.22s ease;
+}
+
+/* The overlay's own title/body read larger than the same markup does
+   packed into a grid cell — part of what makes zooming in actually worth
+   doing, not just a bigger box around identical text. */
+.concept-zoom-card .card-title { font-size: 1.2rem; margin-bottom: 12px; }
+.concept-zoom-card .bit-explainer { font-size: 1rem; line-height: 1.7; }
+
+.concept-zoom-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.concept-zoom-close:hover { background: var(--accent-dim); color: var(--text); }
+
+@media (prefers-reduced-motion: reduce) {
+  .concept-zoom-backdrop, .concept-zoom-card { transition: none; }
+}

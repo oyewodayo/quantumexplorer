@@ -1,0 +1,120 @@
+/* Gates tab (js/tabs/gates-tab.js) — the gate button grid, the always-
+   visible gate reference list, the applied-matrix display, and the gate
+   history trail. Depends on: ../base.css, ../components.css (shared
+   .layout-two/.gates-layout, .bloch-wrap via ../bloch.css). */
+
+/* Left column of .gates-layout — the sphere plus the two cards that
+   report on its current state (explainer + history), grouped together
+   so this column's height roughly matches the right column's gate
+   controls + reference cards instead of leaving a void under a lone
+   sphere card (see index.html's gates-quantum-panel). */
+.gates-left-panel { display: flex; flex-direction: column; gap: 10px; }
+
+/* ─── GATE BUTTONS ───────────────────────────────────── */
+.gate-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+
+.gate-btn {
+  padding: 11px 7px 9px;
+  border-radius: var(--radius-sm);
+  border: 1px solid;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--text-base);
+  font-weight: var(--fw-medium);
+  transition: transform 0.11s, box-shadow 0.11s;
+  background: var(--surface2) var(--sheen-metal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.gate-btn:hover { transform: scale(1.05); box-shadow: 0 0 10px color-mix(in srgb, currentColor 40%, transparent); }
+.gate-btn:active { transform: scale(0.97); }
+
+/* Brief tactile confirmation that a gate was actually applied — synced
+   with a matching pulse on the Bloch sphere card (.bloch-wrap.pulsing
+   in ../bloch.css) so the click and the resulting rotation read as one
+   action. */
+@keyframes gate-btn-pulse {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.14); box-shadow: 0 0 26px 2px currentColor; }
+  100% { transform: scale(1); }
+}
+.gate-btn.pulsing { animation: gate-btn-pulse 0.42s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .gate-btn.pulsing { animation: none; }
+}
+
+.gate-sub {
+  font-size: 0.66rem;
+  font-family: 'Space Grotesk', sans-serif;
+  opacity: 0.6;
+  letter-spacing: 0.01em;
+}
+
+/* ─── GATE REFERENCE (formal names — always visible, not hover-only) ── */
+.gate-reference-list {
+  display: flex;
+  flex-direction: column;
+}
+.gate-reference-row {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  align-items: baseline;
+  gap: 10px;
+  padding: 6px 2px;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-sm);
+}
+.gate-reference-row:last-child { border-bottom: none; }
+.gate-reference-symbol {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: var(--fw-semibold);
+  font-size: var(--text-sm);
+}
+.gate-reference-formal { color: var(--text); }
+.gate-reference-nick { color: var(--text2); font-size: var(--text-sm); white-space: nowrap; }
+
+/* ─── MATRIX ─────────────────────────────────────────── */
+.matrix-display {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.matrix-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--text-sm);
+  color: var(--text2);
+  margin-bottom: 4px;
+  align-self: flex-start;
+}
+.matrix-body {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+}
+.matrix-bracket {
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 200;
+  color: var(--text2);
+}
+.matrix-cells {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+}
+.matrix-cell { text-align: center; }
+
+/* .history-row/.hist-tag ("Applied Sequence" trail) moved to
+   ../components.css — now shared by every tab's Try Me, not gates-only. */

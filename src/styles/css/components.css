@@ -1,0 +1,667 @@
+/* Shared widgets reused across multiple tabs — cards, buttons, sliders,
+   probability bars, the "vs" compare layout, the segmented mode-grid
+   control, etc. If a class is used by more than one tabs/*.js screen,
+   it belongs here rather than in a single tab's own css/tabs/*.css file.
+   Depends on: base.css (theme variables). */
+
+/* ─── COMPARE HEADER ─────────────────────────────────── */
+.compare-header {
+  text-align: center;
+  margin-bottom: 26px;
+}
+.compare-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+.compare-subtitle {
+  font-size: 0.88rem;
+  color: var(--text2);
+  /* Long subtitles (Stern-Gerlach's, Beam Splitter's, ...) would otherwise
+     stretch edge-to-edge on a wide viewport with no #tab-sidebar submenu
+     open to narrow things — capped to a comfortable reading measure and
+     centered under the (usually much shorter) title instead. */
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ─── COMPARE LAYOUT ─────────────────────────────────── */
+.compare-layout {
+  display: grid;
+  grid-template-columns: 320px 40px 1fr;
+  gap: 0;
+  max-width: 1080px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.compare-col { padding: 0 20px; }
+.classical-col { padding-left: 0; }
+.quantum-col { padding-right: 0; }
+
+/* ─── DIVIDER ─────────────────────────────────────────── */
+.compare-divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-top: 8px;
+  min-height: 480px;
+}
+.divider-line { flex: 1; width: 1px; background: var(--border); }
+.divider-vs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text3);
+  letter-spacing: 0.12em;
+  padding: 5px 0;
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+}
+
+/* ─── COLUMN LABELS ──────────────────────────────────── */
+.col-label {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.col-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--text-xs);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.quantum-badge {
+  border-color: var(--zero);
+  color: var(--zero);
+  background: var(--zero-dim);
+}
+.col-desc { font-size: var(--text-sm); color: var(--text2); }
+
+/* ─── CLASSICAL DISPLAY ──────────────────────────────── */
+/* Reused by the Bits tab's classical-bit display, Gates tab's classical
+   AND/OR/etc. output, and Circuits tab's classical wire output. */
+.classical-display-wrap { margin-bottom: 16px; }
+
+.classical-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--text-display);
+  font-weight: 300;
+  text-align: center;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px 0 12px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  user-select: none;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.28s, border-color 0.28s, box-shadow 0.28s;
+}
+
+.classical-display.is-zero { color: var(--text2); }
+
+.classical-label {
+  font-size: var(--text-xs);
+  text-align: center;
+  color: var(--text3);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  margin-top: 7px;
+}
+
+/* ─── TOGGLE SWITCH ──────────────────────────────────── */
+.switch-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 18px 0;
+}
+.bit-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  color: var(--text2);
+  min-width: 12px;
+  text-align: center;
+  transition: color 0.14s;
+}
+.bit-label.active { color: var(--text); }
+
+.toggle-switch { cursor: pointer; display: block; }
+.toggle-switch:has(input:disabled) { cursor: not-allowed; opacity: 0.6; }
+.toggle-switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+/* Bulb-switch (item 1) — the same track/thumb mechanic as before (thumb
+   slides via translateX on :checked), but the thumb itself now reads as a
+   lightbulb: a round glass (the thumb, ::after adds a small screw base)
+   that's dim/unlit off and glows warm amber (--bulb-on/--bulb-glow) on —
+   a literal visualization of the 0/1 it's switching, not just an abstract
+   pill. Every existing .toggle-switch usage (Classical Bit, Quantum
+   Gates' classical inputs, Classical Circuit) gets this for free since
+   none of them touch this markup directly. */
+.toggle-track {
+  position: relative;
+  display: block;
+  width: 68px;
+  height: 32px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  transition: background 0.2s, border-color 0.2s;
+}
+.toggle-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 22px; height: 22px;
+  background: var(--text3);
+  border-radius: 50%;
+  box-shadow: none;
+  transition: transform 0.22s cubic-bezier(0.4,0,0.2,1), background 0.25s, box-shadow 0.25s;
+}
+.toggle-thumb::after {
+  content: '';
+  position: absolute;
+  left: 50%; bottom: -2px;
+  transform: translateX(-50%);
+  width: 10px; height: 3px;
+  background: var(--border2);
+  border-radius: 0 0 2px 2px;
+  transition: background 0.25s;
+}
+.toggle-switch input:checked ~ .toggle-track { border-color: var(--bulb-on); }
+.toggle-switch input:checked ~ .toggle-track .toggle-thumb {
+  transform: translateX(38px);
+  background: var(--bulb-on);
+  box-shadow: 0 0 10px 3px var(--bulb-glow), 0 0 2px var(--bulb-on);
+}
+.toggle-switch input:checked ~ .toggle-track .toggle-thumb::after {
+  background: var(--bulb-on);
+}
+
+/* ─── EXPLAINER ──────────────────────────────────────── */
+.bit-explainer {
+  font-size: var(--text-sm);
+  color: var(--text2);
+  line-height: 1.65;
+  border-left: 2px solid var(--border);
+  padding-left: var(--space-3);
+}
+
+/* ─── QUANTUM INNER LAYOUT ───────────────────────────── */
+.layout-two {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+/* Gates tab overrides */
+.gates-layout {
+  grid-template-columns: 380px 1fr;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.state-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+/* ─── CARDS ──────────────────────────────────────────── */
+.right-panel { display: flex; flex-direction: column; gap: 10px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 13px 15px;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.28s, border-color 0.28s, box-shadow 0.28s;
+}
+.quantum-list {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 20px;
+    font-size: 0.85rem;
+    color: var(--text2);
+    line-height: 1.65;
+    border-left: 2px solid var(--border);
+    padding-left: 11px;
+}
+
+.intro_cards:hover{
+  background: var(--accent-dim);
+}
+
+/* .card-title and .section-label (further below) were two names for the
+   same "small uppercase eyebrow" role that had drifted to slightly
+   different sizes/letter-spacing — merged onto one declaration here;
+   .card-title keeps its own margin since it's always followed directly
+   by card content, unlike .section-label's more varied placements. */
+.card-title {
+  font-size: var(--text-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: var(--space-2);
+}
+
+/* ─── TEXT UTILITIES ─────────────────────────────────── */
+/* Reach for these instead of hand-rolling another one-off caption/eyebrow
+   rule — see --text-xs/--text-sm in base.css for the values. */
+.text-eyebrow {
+  font-size: var(--text-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+.text-caption {
+  font-size: var(--text-sm);
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+/* Emphasizes a key concept word/phrase (superposition, entanglement,
+   qubit, etc.) inline within .bit-explainer prose — item 2. Shares
+   --key-term's amber hue with the bulb-switch's "on" glow above: both are
+   the same "this is the highlight" idea. */
+.key-term {
+  color: var(--key-term);
+  font-weight: var(--fw-semibold);
+}
+
+/* ─── EXPLAINER CARD (dynamic plain-language commentary) ─── */
+.explainer-card {
+  background: var(--accent-dim);
+  border-color: var(--border2);
+}
+.explainer-card .card-title {
+  color: var(--text2);
+}
+.explainer-card .bit-explainer {
+  border-left-color: var(--zero);
+  color: var(--text);
+  transition: opacity 0.15s;
+}
+
+/* ─── STEP HISTORY (item 3) ──────────────────────────── */
+/* A running trail of chips, one per step of an auto-play sequence —
+   originally the Gates tab's own "Applied Sequence" card (gate-history),
+   promoted here so Classical Bit/One Qubit/Two Qubit/Three Qubit's
+   upgraded Try Me runs can reuse the identical look instead of each
+   tab inventing its own history strip. */
+.history-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 25px;
+  margin-bottom: 8px;
+}
+/* Rollback (chips are real <button>s, see runTryMeSequence() in
+   qubit-tab.js) — click any past step to replay it: re-applies that
+   step's state and re-shows its explanation, so a student can jump back
+   and re-read any position instead of only ever seeing the latest one. */
+.hist-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--text-sm);
+  padding: 2px 7px;
+  border-radius: 3px;
+  border: 1px solid;
+  background: none;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.hist-tag:hover { transform: scale(1.08); }
+.hist-tag:disabled { cursor: not-allowed; opacity: 0.6; transform: none; }
+/* The step currently shown in the explainer — tinted with the chip's own
+   (inline) color via currentColor rather than a fixed accent, so it reads
+   correctly no matter which color a given step was assigned. */
+.hist-tag.is-current {
+  font-weight: 700;
+  background: color-mix(in srgb, currentColor 18%, transparent);
+}
+
+/* ─── FORMULA ────────────────────────────────────────── */
+.formula {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.93rem;
+  color: var(--text);
+  margin-bottom: var(--space-3);
+  word-break: break-all;
+}
+
+/* ─── PROB BARS ──────────────────────────────────────── */
+.prob-rows { display: flex; flex-direction: column; gap: 7px; }
+
+.prob-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ket {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  min-width: 26px;
+}
+.zero-color { color: var(--zero); }
+.one-color  { color: var(--one);  }
+.mid-color  { color: var(--text2); } /* a ket that's neither |0...0⟩ nor |1...1⟩ in a joint-state table */
+
+.track {
+  flex: 1;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.36s cubic-bezier(0.4,0,0.2,1);
+}
+.zero-fill { background: var(--zero); }
+.one-fill  { background: var(--one);  }
+
+.pct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.81rem;
+  color: var(--text2);
+  min-width: 34px;
+  text-align: right;
+}
+
+/* ─── PRESET BUTTONS ─────────────────────────────────── */
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+/* For a 4-button preset grid (|0⟩ |1⟩ / |+⟩ |-⟩) — the default 3-column
+   track leaves a lone 4th button stranded on its own row instead of a
+   clean 2x2. */
+.preset-grid--2col {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.preset-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.92rem;
+  padding: 9px 6px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.13s;
+}
+.preset-btn:hover {
+  border-color: var(--zero);
+  color: var(--zero);
+  background: var(--zero-dim);
+}
+.preset-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Marks whichever preset (if any) matches the sphere's current theta/phi
+   — kept in sync from updateQubitUI()/updateQubit2UI() via
+   highlightMatchingPreset() in qubit-tab.js, so it tracks drags and the
+   Try me auto-cycle exactly like a manual preset click. */
+.preset-btn.is-active {
+  border-color: var(--zero);
+  color: var(--zero);
+  background: color-mix(in srgb, var(--zero) 14%, var(--surface2));
+  font-weight: 600;
+}
+.preset-btn.is-active:hover { border-color: var(--zero); color: var(--zero); }
+
+/* ─── SLIDERS ────────────────────────────────────────── */
+.slider-group { display: flex; flex-direction: column; gap: 10px; }
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slider-sym {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.94rem;
+  color: var(--text2);
+  min-width: 14px;
+  text-align: center;
+}
+
+.slider-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.81rem;
+  color: var(--text);
+  min-width: 34px;
+  text-align: right;
+}
+
+input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 3px;
+  background: var(--border2);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: var(--text);
+  cursor: pointer;
+  transition: width 0.1s, height 0.1s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { width: 16px; height: 16px; }
+input[type="range"]:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── MUTED TEXT ─────────────────────────────────────── */
+.muted-text { color: var(--text3); font-size: 0.88rem; }
+
+/* ─── BTN SECONDARY ──────────────────────────────────── */
+/* item 4 — each button family gets its own accent + bold weight instead
+   of sharing one neutral surface/border palette (--action-secondary is
+   indigo: Clear/Reset/Copy-link/utility actions). */
+.btn-secondary {
+  background: none;
+  border: 1px solid var(--action-secondary);
+  color: var(--action-secondary);
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.86rem;
+  font-weight: 700;
+  transition: all 0.13s;
+}
+.btn-secondary:hover { background: var(--action-secondary-dim); border-color: var(--action-secondary); color: var(--action-secondary); }
+.btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-secondary:disabled:hover { background: none; border-color: var(--action-secondary); color: var(--action-secondary); }
+
+/* ─── CONFIRM MODAL ──────────────────────────────────── */
+/* Custom replacement for the browser's native confirm() popup — see
+   showConfirmModal() in core/dom-utils.js. Same fixed-backdrop
+   convention as .tour-backdrop in tour.css, just centered with its own
+   card instead of anchored to a highlighted element. */
+.confirm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.16s;
+}
+.confirm-modal-backdrop.visible { opacity: 1; }
+
+.confirm-modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 22px 24px;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: var(--shadow-md);
+  transform: scale(0.94);
+  transition: transform 0.16s;
+}
+.confirm-modal-backdrop.visible .confirm-modal { transform: scale(1); }
+
+.confirm-modal-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.confirm-modal-message {
+  font-size: 0.88rem;
+  color: var(--text2);
+  line-height: 1.55;
+}
+.confirm-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-confirm {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.86rem;
+  font-weight: 600;
+  background: var(--zero);
+  color: #fff;
+  transition: filter 0.13s;
+}
+.btn-confirm:hover { filter: brightness(1.12); }
+.btn-confirm.danger { background: var(--danger); }
+
+@media (prefers-reduced-motion: reduce) {
+  .confirm-modal-backdrop, .confirm-modal { transition: none; }
+}
+
+.btn-secondary.is-done {
+  border-color: var(--success);
+  color: var(--success);
+  background: var(--success-dim);
+}
+.btn-secondary.is-done:hover { border-color: var(--success); color: var(--success); }
+
+/* ─── BTN RUN ────────────────────────────────────────── */
+/* Used by every "run the simulation" action — Circuits' Run button,
+   Tunnel's Play/Pause, Beam Splitter's Fire photon, and the tour's own
+   Next/Done button. item 4 — teal --action-run accent, its own identity
+   distinct from --btn-secondary's indigo and --btn-measure's rose. */
+.btn-run {
+  background: var(--action-run-dim);
+  border: 1px solid var(--action-run);
+  color: var(--action-run);
+  padding: 9px 19px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.91rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  transition: all 0.15s;
+}
+.btn-run:hover { filter: brightness(1.12); box-shadow: 0 0 12px var(--action-run); }
+
+/* ─── SECTION LABEL ──────────────────────────────────── */
+/* The small uppercase eyebrow ("Gate Palette", "Output State", etc.)
+   used above nearly every control group across every tab — same rule as
+   .card-title above (also see .text-eyebrow, the utility-class version
+   of this same role for markup that isn't literally a section label or
+   card title). */
+.section-label {
+  font-size: var(--text-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+/* ─── SEGMENTED MODE CONTROL ─────────────────────────── */
+/* Segmented control (Concepts/Roadmap, 1 Qubit/2 Qubits, mode
+   switches, etc.) — a single pill-shaped envelope with borderless
+   segments, rather than a row of separate outlined buttons. Each usage
+   sets its own grid-template-columns inline (defaults to one column /
+   vertical stack, as Interference's Double/Single/Which-path uses). */
+.mode-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 3px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* The active segment's highlight — a single element that slides/resizes
+   to the active button's position instead of each button drawing its
+   own background, so switching segments animates like a native
+   iOS/macOS segmented control. Positioned by initModeGridThumbs() in
+   core/dom-utils.js. */
+.mode-grid-thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: var(--surface);
+  border-radius: 7px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), width 0.25s, height 0.25s;
+  z-index: 0;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mode-grid-thumb { transition: none; }
+}
+
+.mode-btn {
+  position: relative;
+  z-index: 1;
+  border: none;
+  background: transparent;
+  border-radius: 7px;
+  padding: 10px 10px;
+}
+.mode-btn:not(.active):hover { color: var(--text); background: var(--accent-dim); }
+.mode-btn.active { font-weight: 700; }
+
+/* ─── SPACING UTILITY ────────────────────────────────── */
+/* The one inline-style pattern repeated often enough (10+ places) across
+   index.html to be worth a class instead — deliberately not a general
+   spacing-scale system (.mt-4/.mt-8/...), since nothing else recurs
+   nearly as often; most spacing in this app is still one-off and stays
+   inline on purpose. */
+.mt-14 { margin-top: 14px; }
+.mode-btn.active { color: var(--zero); }

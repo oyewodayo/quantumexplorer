@@ -1,0 +1,126 @@
+/* Teleport tab (js/tabs/teleport-tab.js) — the protocol circuit card, the
+   Alice→Bob Bloch-sphere comparison, and the classical-bits/tally row.
+   Depends on: ../base.css, ../components.css (.card, .btn-run,
+   .btn-secondary, .muted-text, .compare-layout/.compare-col/.col-label/
+   .col-badge/.quantum-badge/.col-desc, .bloch-wrap/.state-label,
+   .preset-grid, .formula, .slider-group/.slider-row/.slider-sym/
+   .slider-val, .bit-explainer, .histogram/.hist-col/.hist-track/
+   .hist-bar, .ket/.pct/.zero-color/.one-color/.mid-color/.zero-fill/
+   .one-fill), ../tabs/bell-states.css (.circuit-gate/.circuit-gate-off
+   and its circuit-gate-glow keyframes, reused as-is for the Z/X
+   correction gates — a fired correction keeps a gentle glow until the
+   next Teleport/Reset, which reads as "this is what's currently in
+   effect", not just a transient flash). */
+
+.teleport-layout {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.teleport-circuit-card { padding: 16px 16px 12px; box-shadow: var(--shadow-md); }
+
+#teleport-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.teleport-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.teleport-compare { margin-top: 4px; }
+
+.teleport-bob-badge {
+  border-color: var(--one);
+  color: var(--one);
+  background: var(--one-dim);
+}
+
+.teleport-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 14px;
+}
+
+@media (max-width: 760px) {
+  .teleport-controls-grid { grid-template-columns: 1fr; }
+  .compare-layout.teleport-compare { grid-template-columns: 1fr; }
+  .compare-layout.teleport-compare .compare-divider { display: none; }
+}
+
+/* ─── CLASSICAL BITS ─────────────────────────────────── */
+.teleport-bits-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+.teleport-bit-chip {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 0;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+}
+.teleport-bit-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+.teleport-bit-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+  transition: color 0.2s;
+}
+.teleport-bit-val.set { color: var(--one); }
+
+.teleport-histogram { gap: 12px; height: 90px; }
+
+/* ─── CIRCUIT DIAGRAM ────────────────────────────────── */
+/* Each protocol stage (#teleport-stage-pair/-bellmeas/-measure) is inert
+   until teleport-tab.js adds .active for its ~700ms turn in the animated
+   run, then removes it again — a one-shot spotlight, unlike Bell States'
+   perpetually-looping glow (this diagram illustrates a single event
+   playing out, not an always-flowing recipe). */
+.teleport-stage { transform-origin: center; }
+.teleport-stage.active {
+  animation: teleport-stage-glow 0.7s ease-in-out;
+}
+@keyframes teleport-stage-glow {
+  0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+  40% { filter: drop-shadow(0 0 6px var(--zero)); }
+}
+
+/* The classical double-line "wires" carrying m0/m1 down to Bob's
+   correction gates — dashed and marching only while teleport-tab.js has
+   them actively "sending" (.teleport-cwire.sending), otherwise a plain
+   static line like the rest of the diagram. */
+.teleport-cwire.sending {
+  animation: teleport-cwire-flow 0.6s linear infinite;
+}
+.teleport-cwire.sending line {
+  stroke-dasharray: 5 4;
+}
+@keyframes teleport-cwire-flow { to { stroke-dashoffset: -18; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .teleport-stage.active, .teleport-cwire.sending,
+  #teleport-gate-z.circuit-gate:not(.circuit-gate-off),
+  #teleport-gate-x.circuit-gate:not(.circuit-gate-off) { animation: none; }
+}

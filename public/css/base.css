@@ -1,0 +1,188 @@
+/* ═══════════════════════════════════════════════════════
+   QUANTUM EXPLORER v2 · Monochrome Design System
+   Palette: Black/white base · Functional color only
+   ═══════════════════════════════════════════════════════ */
+/* Foundation layer: theme variables (dark/light), the CSS reset, and the
+   handful of bare-bones utility classes everything else builds on. Every
+   other css/*.css file assumes this one loaded first. */
+
+:root {
+  /* ── Dark theme (default) ──────────────────────── */
+  --bg:           #0B0B0B;
+  --surface:      #141414;
+  --surface2:     #1D1D1D;
+  --border:       #282828;
+  --border2:      #3C3C3C;
+  --text:         #F0F0F0;
+  --text2:        #888888;
+  --text3:        #55555C;
+  --text4:        #55555C;
+  --accent-dim:   rgba(255,255,255,0.06);
+  --accent-glow:  rgba(255,255,255,0.10);
+  --shadow-sm:    0 1px 2px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.02) inset;
+  --shadow-md:    0 6px 20px rgba(0,0,0,0.45);
+  --header-shadow: 0 1px 0 var(--border), 0 2px 20px rgba(0,0,0,0.35);
+
+  /* Functional — |0⟩ CERN blue (Pantone 286C, lightened for dark backgrounds),
+     |1⟩ pink — only used for probability UI */
+  --zero:         #5B8DEF;
+  --zero-dim:     rgba(91, 141, 239, 0.14);
+  --one:          #F472B6;
+  --one-dim:      rgba(244, 114, 182, 0.14);
+  --success:      #34D399;
+  --success-dim:  rgba(52, 211, 153, 0.14);
+  --danger:       #F87171;
+  --danger-dim:   rgba(248, 113, 113, 0.14);
+
+  /* Per-button-family accent colors (item 4) — gives .btn-run/.btn-secondary/
+     .btn-measure their own identity instead of sharing one neutral
+     surface/border palette. --key-term/--bulb-on share one amber hue
+     (item 2's emphasized terms and item 1's lit bulb are the same "this
+     is the highlight" idea) rather than each getting its own arbitrary
+     color. */
+  --action-run:       #2DD4BF;
+  --action-run-dim:   rgba(45, 212, 191, 0.14);
+  --action-secondary: #818CF8;
+  --action-secondary-dim: rgba(129, 140, 248, 0.14);
+  --action-measure:   #FB7185;
+  --action-measure-dim: rgba(251, 113, 133, 0.14);
+  --key-term:         #FBBF24;
+  --bulb-on:          #FBBF24;
+  --bulb-glow:         rgba(251, 191, 36, 0.55);
+
+  /* Bloch sphere — resolved by JS via refreshThemeColors() */
+  --bloch-arrow:       rgba(255,255,255,0.92);
+  --bloch-sphere-bg:   rgba(255,255,255,0.025);
+  --bloch-sphere-ring: rgba(255,255,255,0.18);
+  --bloch-grid:        rgba(255,255,255,0.13);
+  --bloch-grid-back:   rgba(255,255,255,0.04);
+  --bloch-axis-z:      #5B8DEF;
+  --bloch-axis-other:  rgba(200,200,200,0.28);
+  --bloch-proj:        rgba(255,255,255,0.18);
+  --bloch-tip:         rgba(255,255,255,0.88);
+
+  --header-h: 56px;
+  --dock-clear: 210px;  /* left clearance for the always-expanded tab dock — see #tab-sidebar; widened alongside the larger tab pills/fonts below */
+  --tab-strip-h: 48px;
+
+  /* ── Design tokens (theme-independent — same in dark and light) ───
+     Structural scale every css/*.css file should reach for instead of
+     hand-picking a one-off px/rem value. Added to consolidate years of
+     drift (e.g. "caption text" had settled into 8 different near-.85rem
+     sizes across tab files, "card" containers into 3 different radii)
+     rather than a from-scratch redesign — existing values were audited
+     and rounded onto this scale, not invented independently of them. */
+  --text-xs:      0.72rem;  /* eyebrow / uppercase labels */
+  --text-sm:      0.85rem;  /* captions, secondary body, buttons */
+  --text-base:    1rem;     /* body copy */
+  --text-md:      1.1rem;
+  --text-lg:      1.3rem;   /* section/page titles */
+  --text-xl:      1.75rem;
+  --text-display: 6rem;     /* hero numerals (Classical Bit's big digit) */
+
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-7: 48px;
+
+  --radius-sm:   6px;   /* buttons, pips, badges */
+  --radius-md:   10px;  /* cards, .mode-grid */
+  --radius-pill: 999px;
+
+  /* Formalizes the "0 0 Npx currentColor" hover/active glow already used
+     ad hoc across gate/circuit buttons (previously 11 different
+     magnitudes) — currentColor means each button still glows in its own
+     color without the token needing to know what that color is. */
+  --glow-sm: 0 0 12px currentColor;
+  --glow-md: 0 0 18px currentColor;
+
+  /* The same "lit from above" white-to-black overlay already used on the
+     Stern-Gerlach apparatus SVG (sg-metal-sheen in index.html) — same
+     stops, as a CSS background-image instead of an SVG gradient, so
+     every CSS-rendered gate box (.gate-btn, .circuit-gate-btn,
+     .circuit2-gate, .gate-slot) can share the exact same material
+     language as the physical apparatus diagrams rather than staying
+     flat. Layered on top of each element's own background-color, not
+     replacing it, so gate-specific hues (each button's border-color)
+     still show through underneath. */
+  --sheen-metal: linear-gradient(180deg, rgba(255,255,255,0.38) 0%, rgba(255,255,255,0.1) 14%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.22) 100%);
+}
+
+[data-theme="light"] {
+  /* Cards are deliberately whiter than the page canvas (--surface lighter
+     than --bg) so they visually lift off the background — combined with
+     --shadow-sm/--shadow-md below, this is what gives light mode real
+     depth instead of the previous flat, same-tone-as-background look. */
+  --bg:           #F1F1F3;
+  --surface:      #FFFFFF;
+  --surface2:     #EBEBEF;
+  --border:       #E3E3E8;
+  --border2:      #CDCDD4;
+  --text:         #0C0C0F;
+  --text2:        #63636B;
+  --text3:        #96969F;
+  --text4:        #96969F;
+  --accent-dim:   rgba(12,12,15,0.05);
+  --accent-glow:  rgba(12,12,15,0.10);
+  --shadow-sm:    0 1px 2px rgba(20,20,30,0.05), 0 1px 0 rgba(20,20,30,0.03);
+  --shadow-md:    0 8px 24px rgba(20,20,30,0.08), 0 2px 6px rgba(20,20,30,0.05);
+  --header-shadow: 0 1px 0 var(--border), 0 2px 16px rgba(20,20,30,0.04);
+
+  --zero:         #0033A0;
+  --zero-dim:     rgba(0, 51, 160, 0.11);
+  --one:          #BE185D;
+  --one-dim:      rgba(190, 24, 93, 0.11);
+  --success:      #059669;
+  --success-dim:  rgba(5, 150, 105, 0.11);
+  --danger:       #DC2626;
+  --danger-dim:   rgba(220, 38, 38, 0.11);
+
+  --action-run:       #0F766E;
+  --action-run-dim:   rgba(15, 118, 110, 0.11);
+  --action-secondary: #4F46E5;
+  --action-secondary-dim: rgba(79, 70, 229, 0.10);
+  --action-measure:   #E11D48;
+  --action-measure-dim: rgba(225, 29, 72, 0.10);
+  --key-term:         #B45309;
+  --bulb-on:          #F59E0B;
+  --bulb-glow:         rgba(245, 158, 11, 0.45);
+
+  --bloch-arrow:       rgba(10,10,10,0.88);
+  --bloch-sphere-bg:   rgba(0,0,0,0.015);
+  --bloch-sphere-ring: rgba(0,0,0,0.20);
+  --bloch-grid:        rgba(0,0,0,0.13);
+  --bloch-grid-back:   rgba(0,0,0,0.04);
+  --bloch-axis-z:      #0033A0;
+  --bloch-axis-other:  rgba(60,60,60,0.32);
+  --bloch-proj:        rgba(0,0,0,0.18);
+  --bloch-tip:         rgba(10,10,10,0.88);
+}
+
+/* ─── RESET ───────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* Raises every rem-based font-size across the app by ~12% in one place —
+   this app is aimed at students new to quantum computing, and the dense
+   label/badge text throughout (originally sized for a compact dashboard)
+   was too small to comfortably read at the default 16px root. */
+html { font-size: 18px; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.28s, color 0.28s;
+}
+
+p-5 { padding: 5px; }
+.px-5 { padding-left: 5px; padding-right: 5px; }
+.py-5 { padding-top: 5px; padding-bottom: 5px; }
+.container{
+  max-width: 1080px;
+  margin: 0 auto;
+}

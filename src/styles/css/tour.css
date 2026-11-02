@@ -1,0 +1,42 @@
+/* First-run guided tour overlay — pairs with js/tour.js.
+   Depends on: base.css, components.css (.btn-secondary/.btn-run, used
+   for the tour's Skip/Next buttons). */
+
+.tour-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 300;
+}
+.tour-highlight {
+  position: relative;
+  z-index: 301;
+  box-shadow: 0 0 0 4px var(--zero), 0 0 24px rgba(91,141,239,0.55);
+  border-radius: 8px;
+}
+/* header is its own stacking context (fixed + z-index), so a highlighted
+   child inside it needs the whole header raised to clear the backdrop */
+.tour-raise-header { z-index: 305 !important; }
+
+.tour-popover {
+  position: fixed;
+  z-index: 302;
+  max-width: 280px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.32);
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.tour-step-count {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+.tour-popover p { line-height: 1.55; margin-bottom: 12px; }
+.tour-actions { display: flex; justify-content: flex-end; gap: 8px; }

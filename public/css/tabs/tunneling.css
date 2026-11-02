@@ -1,0 +1,156 @@
+/* Quantum Tunneling tab (js/tabs/tunneling-tab.js) — the wave-packet
+   canvas card, its stats row, and the run-history strip below it.
+   Depends on: ../base.css, ../components.css (.btn-run, .btn-secondary,
+   .muted-text). */
+
+.tunnel-layout {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tunnel-canvas-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 16px 12px;
+  box-shadow: var(--shadow-md);
+  transition: background 0.28s, border-color 0.28s, box-shadow 0.28s;
+}
+
+#tunnel-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.tunnel-stats {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.tunnel-stat {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.stat-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stat-label {
+  font-size: 0.82rem;
+  color: var(--text2);
+}
+
+.stat-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  min-width: 44px;
+}
+
+.tunnel-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.6fr;
+  gap: 14px;
+}
+
+.tunnel-btn-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 760px) {
+  .tunnel-controls-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── RUN HISTORY STRIP ───────────────────────────────── */
+.tunnel-history-row {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.tunnel-history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.tunnel-history-title {
+  font-size: 0.82rem;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.tunnel-history-clear {
+  padding: 3px 10px;
+  font-size: 0.78rem;
+}
+
+.tunnel-history {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 46px;
+  overflow: hidden;
+}
+
+.tunnel-history-empty {
+  font-size: 0.8rem;
+  color: var(--text3);
+  align-self: center;
+}
+
+.tunnel-history-bar {
+  width: 9px;
+  flex-shrink: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 2px;
+  overflow: hidden;
+  opacity: 0.55;
+  transition: opacity 0.2s;
+}
+.tunnel-history-bar:hover,
+.tunnel-history-bar.latest { opacity: 1; }
+
+.tunnel-history-bar .seg-trans { background: var(--one); }
+.tunnel-history-bar .seg-refl  { background: var(--zero); }
+
+/* ─── VALIDATION BADGE ────────────────────────────────── */
+.tunnel-validation-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 8px 10px;
+  background: var(--success-dim);
+  border: 1px solid var(--success);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: var(--text2);
+  line-height: 1.45;
+}
+.tunnel-validation-check {
+  color: var(--success);
+  font-weight: 700;
+  flex-shrink: 0;
+}

@@ -1,0 +1,83 @@
+/* Noise & Decoherence tab (js/tabs/noise-tab.js) — the Bloch-sphere/
+   live-readout comparison row and the initial-state/decay-time controls.
+   Depends on: ../base.css, ../components.css (.card, .btn-run,
+   .btn-secondary, .muted-text, .compare-layout/.compare-col/.col-label/
+   .col-badge/.quantum-badge/.col-desc, .bloch-wrap/.state-label,
+   .preset-grid, .slider-group/.slider-row/.slider-sym/.slider-val,
+   .bit-explainer, .formula, .track/.fill/.zero-fill). */
+
+.noise-layout {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.noise-compare { margin-bottom: 4px; }
+
+.noise-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.6fr;
+  gap: 14px;
+}
+@media (max-width: 900px) {
+  .noise-controls-grid { grid-template-columns: 1fr; }
+  .compare-layout.noise-compare { grid-template-columns: 1fr; }
+  .compare-layout.noise-compare .compare-divider { display: none; }
+}
+
+.noise-btn-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+/* ─── LIVE READOUT ───────────────────────────────────── */
+.noise-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.noise-stat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.noise-stat-label { font-size: 0.82rem; color: var(--text2); }
+.noise-stat-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.noise-purity-track {
+  margin-top: 6px;
+  height: 6px;
+}
+.noise-purity-track .fill { transition: width 0.15s linear; }
+
+/* ─── DENSITY MATRIX ─────────────────────────────────── */
+.noise-matrix {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 8px;
+  max-width: 220px;
+}
+.noise-matrix span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 8px 4px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}

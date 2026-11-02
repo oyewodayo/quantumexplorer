@@ -1,0 +1,63 @@
+/* Introduction tab — the glossary cards and the "Suggested learning
+   path" list (rendered by renderIntroLearningPath() in js/roadmap.js).
+   Depends on: ../base.css, ../components.css (.card, .card-title,
+   .bit-explainer, .section-label, .btn-secondary). */
+
+.intro-layout { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+.intro-glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (max-width: 640px) {
+  .intro-glossary-grid { grid-template-columns: 1fr; }
+}
+
+/* Important Concepts glossary cards only — a slight lift + shadow on
+   hover invites browsing this reference page. Scoped to #tab-important-concepts
+   rather than .intro-glossary-grid .card generally, since Introduction's
+   own glossary cards share the exact same grid/card markup and are
+   deliberately left static. z-index lifts the hovered card above its
+   neighbors so the 2% scale-up doesn't render underneath the next card
+   in the grid. */
+#tab-important-concepts .intro-glossary-grid .card {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+#tab-important-concepts .intro-glossary-grid .card:hover {
+  box-shadow: var(--shadow-md);
+  transform: scale(1.02);
+  position: relative;
+  z-index: 1;
+}
+
+.intro-path { display: flex; flex-direction: column; gap: 10px; }
+
+.intro-path-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  box-shadow: var(--shadow-sm);
+}
+.intro-path-num {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: var(--accent-dim);
+  color: var(--text2);
+}
+.intro-path-body { flex: 1; min-width: 0; }
+.intro-path-title { font-weight: 600; font-size: 1rem; margin-bottom: 2px; }
+.intro-path-desc { font-size: 0.85rem; color: var(--text2); line-height: 1.5; }
+.intro-path-item .btn-secondary { flex-shrink: 0; }

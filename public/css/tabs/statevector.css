@@ -1,0 +1,15 @@
+/* State-vector comparison widget (js/tabs/statevector-tab.js), embedded
+   in Maths Concept's State Vector section — just the canvas frame; the
+   actual vector drawing is done in JS. Depends on: ../base.css. */
+
+.sv-canvas-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.28s, border-color 0.28s, box-shadow 0.28s;
+}

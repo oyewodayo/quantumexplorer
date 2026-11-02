@@ -1,0 +1,137 @@
+/* Stern–Gerlach tab (js/tabs/stern-gerlach-tab.js) — one SVG diagram card,
+   a single magnet drawn once, fed either by an adjustable-angle oven or a
+   pre-measured "prepared" input depending on the Number-of-Magnets
+   toggle, and its controls row. Structurally identical to Beam Splitter's
+   own card/actions/controls-grid layout
+   (css/tabs/beam-splitter.css) — same class shapes, "sg-" prefix instead
+   of "bs-". Depends on: ../base.css, ../components.css (.btn-run,
+   .muted-text, .mode-grid, .prob-rows, .slider-group, .explainer-card),
+   ../tabs/measure.css (.histogram/.hist-col/.hist-track/.hist-bar). */
+
+.sterngerlach-layout {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sterngerlach-canvas-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 16px 12px;
+  box-shadow: var(--shadow-md);
+  transition: background 0.28s, border-color 0.28s, box-shadow 0.28s;
+}
+
+#sg-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.sterngerlach-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.sterngerlach-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.6fr;
+  gap: 14px;
+}
+
+@media (max-width: 900px) {
+  .sterngerlach-controls-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── DIAGRAM VISUAL EFFECTS ──────────────────────────── */
+/* Same three effects as Beam Splitter's own diagram (css/tabs/beam-splitter.css):
+   a gently breathing incoming beam, slowly marching dashed "possibility"
+   guides toward each outcome, and an expanding ring "click" flash on
+   whichever detector an atom lands in (fired via pulseElement(ping,
+   'active', …) in stern-gerlach-tab.js). */
+.sg-beam { animation: sg-beam-pulse 1.8s ease-in-out infinite; }
+@keyframes sg-beam-pulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+
+.sg-path-ghost {
+  animation: sg-dash-flow 1.1s linear infinite;
+  pointer-events: none;
+}
+@keyframes sg-dash-flow { to { stroke-dashoffset: -24; } }
+
+.sg-ping {
+  transform-box: fill-box;
+  transform-origin: center;
+  pointer-events: none;
+}
+.sg-ping.active { animation: sg-ping-expand 0.6s ease-out; }
+@keyframes sg-ping-expand {
+  0%   { transform: scale(0.4); opacity: 0.85; }
+  100% { transform: scale(2.1); opacity: 0; }
+}
+
+/* The field-line fans between the knife-edge and trough poles — like
+   .sg-beam, a gentle breathing pulse so the field itself reads as
+   "present" rather than a static decoration, even with no atom in
+   flight. */
+.sg-field-fan { animation: sg-field-pulse 2.2s ease-in-out infinite; }
+@keyframes sg-field-pulse {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.7; }
+}
+
+/* Small dots drifting along each beam segment, layered on top of
+   .sg-beam's own pulse — reads as a stream of individual atoms rather
+   than a static ray. --dx (set per-circle inline) is each segment's
+   length in px; negative animation-delay staggers the three circles per
+   segment so they're already mid-flight on first paint instead of all
+   bunching at the start together. */
+.sg-particle-stream { pointer-events: none; }
+.sg-particle {
+  animation: sg-particle-flow 1.5s linear infinite;
+  opacity: 0;
+}
+@keyframes sg-particle-flow {
+  0%   { transform: translateX(0); opacity: 0; }
+  15%  { opacity: 0.9; }
+  85%  { opacity: 0.9; }
+  100% { transform: translateX(var(--dx)); opacity: 0; }
+}
+
+/* Oven heat glow — slow breathing so the source reads as actively hot
+   rather than a static warm patch. */
+.sg-heat-glow { animation: sg-heat-pulse 3s ease-in-out infinite; }
+@keyframes sg-heat-pulse {
+  0%, 100% { opacity: 0.7; }
+  50%      { opacity: 1; }
+}
+
+/* Accumulated detection marks (sgAddScreenMark() in
+   stern-gerlach-tab.js) — each pops in rather than appearing instantly,
+   so a fired atom still reads as a discrete event even once the plate
+   is dense with earlier hits. */
+.sg-mark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sg-mark-in 0.35s ease-out;
+}
+@keyframes sg-mark-in {
+  0%   { transform: scale(0); }
+  60%  { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sg-beam, .sg-path-ghost, .sg-ping.active, .sg-field-fan,
+  .sg-particle, .sg-heat-glow, .sg-mark { animation: none; }
+}

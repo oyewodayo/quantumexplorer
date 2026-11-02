@@ -1,0 +1,273 @@
+/* Home page: the Roadmap view wrapper, the "My Progress" checklist/quiz-
+   score readout, and the mind-map itself (plus its narrow-screen
+   fallback list). Depends on: base.css, components.css (.preset-btn,
+   used inside .roadmap-quiz-options). */
+
+/* ─── ROADMAP VIEW ───────────────────────────────────── */
+/* Deliberately its own selector, never .tab-content — switchToTab()
+   (js/app.js) sweeps every .tab-content on every simulation tab switch,
+   and this view must never be caught by that sweep. */
+#roadmap-view {
+  display: none;
+  padding: calc(var(--header-h) + 28px) 24px 40px;
+  min-height: 100vh;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+#roadmap-view.active { display: block; animation: tab-fade-in 0.22s ease; }
+@media (prefers-reduced-motion: reduce) {
+  #roadmap-view.active { animation: none; }
+}
+
+.roadmap-panel { display: block; }
+
+.roadmap-lesson-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+.roadmap-checklist-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.9rem;
+  color: var(--text2);
+}
+.roadmap-checklist-row input[type="checkbox"] {
+  width: 15px; height: 15px;
+  accent-color: var(--zero);
+}
+
+.progress-row { display: flex; align-items: center; gap: 10px; }
+
+.roadmap-quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+.roadmap-quiz-options .preset-btn {
+  text-align: left;
+  padding: 10px 14px;
+}
+/* Per-answer feedback for each lesson's embedded Quick check (reads
+   ROADMAP_QUIZ, see roadmap.js). */
+.roadmap-quiz-options .quiz-correct {
+  border-color: var(--zero);
+  color: var(--zero);
+  background: var(--zero-dim);
+  opacity: 1;
+}
+.roadmap-quiz-options .quiz-incorrect {
+  border-color: var(--one);
+  color: var(--one);
+  
+  background: var(--one-dim);
+  opacity: 1;
+}
+.roadmap-quiz-options .preset-btn:disabled:not(.quiz-correct):not(.quiz-incorrect) {
+  cursor: default;
+  opacity: 0.55;
+}
+
+/* Lesson-embedded Quick check */
+.roadmap-quickcheck {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.roadmap-quickcheck-label {
+  font-size: 0.71rem;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+.roadmap-quickcheck-q {
+  font-size: 0.88rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* ─── ROADMAP MIND-MAP (home page) ───────────────────── */
+/* Wraps the heading + mind-map so both can be vertically centered as one
+   block filling the initial viewport — the min-height cancels out
+   exactly against #roadmap-view's own top padding,
+   calc(var(--header-h) + 28px), so the hero's bottom edge lands on the
+   viewport's bottom edge. */
+.roadmap-hero {
+  display: flex;
+  flex-direction: column;
+}
+.roadmap-hero.roadmap-hero--full {
+  min-height: calc(100vh - var(--header-h) - 28px);
+  justify-content: center;
+}
+
+/* Geometry (node/curve positions) is computed in JS — see
+   renderRoadmapMindmap() in roadmap.js — since it depends on the
+   container's actual measured size. This block is purely visual. */
+.roadmap-mindmap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 340px;
+  max-height: 860px;
+  margin-bottom: 26px;
+}
+.roadmap-mindmap svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 0;
+}
+/* Branch shapes are filled tapered wedges (thick at the trunk end,
+   narrow at the tip), one per parent→child connection — built and
+   colored per-branch in JS (see taperedBranch() in renderRoadmapMindmap),
+   not stroked lines, so no generic path styling here beyond a soft edge. */
+.roadmap-mindmap svg path { stroke: none; }
+.mindmap-center {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  min-width: 200px;
+  height: 64px;
+  padding: 0 30px;
+  border-radius: 999px;
+  border: 2.5px solid var(--text);
+  background: var(--surface);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: 0.01em;
+  box-shadow: var(--shadow-md);
+}
+/* Level1/level2 branch nodes render as clean pill chips — a thin
+   all-around border in the branch's own color (--branch-color, set
+   inline in renderNode()), rather than the plain-text-over-an-underline
+   look this used to have. The label itself needs an opaque backdrop
+   (matching the page, not a card surface, since it sits directly on the
+   hero) and to stack above the SVG layer — otherwise a branch line
+   passing under a node's anchor point shows straight through the gaps
+   in the text instead of stopping at the label. */
+.mindmap-node {
+  position: absolute;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  background: var(--bg);
+  border: 1.5px solid var(--branch-color, var(--border2));
+  border-radius: 999px;
+  padding: 7px 15px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.13s, opacity 0.13s, box-shadow 0.13s, border-color 0.13s;
+}
+.mindmap-node:hover { background: var(--surface2); box-shadow: var(--shadow-md); }
+/* Read state needs to stay legible against every branch color, not just
+   whichever ones happen to contrast well with a faint green wash — the
+   border switches to a solid success-green (overriding --branch-color)
+   and the checkmark below is a second, background-independent signal.
+   Background uses color-mix() rather than --success-dim's translucent
+   rgba: --success-dim lets the branch line underneath show straight
+   through (the same bleed-through bug as a fully transparent background,
+   just fainter), where this mix is a fully opaque color and actually
+   blocks it. */
+.mindmap-node.is-done {
+  background: color-mix(in srgb, var(--success) 15%, var(--bg));
+  border-color: var(--success);
+}
+.mindmap-done-mark {
+  color: var(--success);
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+/* Sub-branch nodes (Qubit/Gates/Circuits' children and grandchildren) —
+   visually subordinate to the 10 top-level branches: smaller, thinner
+   border, and a touch dimmer, so the tree reads as nested rather than
+   as equally-weighted siblings. */
+.mindmap-node--sub {
+  font-size: 0.92rem;
+  font-weight: 500;
+  border-width: 1px;
+  padding: 5px 12px;
+  opacity: 0.88;
+}
+/* Non-navigable nodes (Introduction, and every collapse/expand-only
+   sub-branch) — no [data-lesson-tryit], so no "this leads somewhere"
+   affordance on hover. */
+.mindmap-node--static { cursor: default; }
+.mindmap-node--static:hover { background: transparent; }
+
+/* Expand/collapse toggle for a branch with children — nested inside its
+   parent's own button (see renderNode() in roadmap.js) but handled by a
+   separate [data-mindmap-toggle] listener so it never also triggers the
+   parent's navigation. A fixed blue regardless of the parent's own
+   branch color, matching the source diagram's toggle affordance being a
+   consistent UI element rather than color-coded per branch. */
+.mindmap-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  margin-left: 8px;
+  border-radius: 50%;
+  background: #3B5BDB;
+  color: #fff;
+  font-size: 0.82rem;
+  line-height: 1;
+  vertical-align: middle;
+  transition: filter 0.13s;
+}
+.mindmap-toggle:hover { filter: brightness(1.15); }
+
+/* Plain vertical list standing in for the mind-map below 760px, where its
+   absolutely-positioned nodes have no room — see renderMindmapFallback()
+   in roadmap.js. Hidden on wider screens, where the mind-map itself
+   covers the same "click a concept" job. */
+.roadmap-mindmap-fallback {
+  display: none;
+}
+.mindmap-fallback-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--branch-color, var(--border));
+  border-radius: 9px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.92rem;
+  color: var(--text2);
+  cursor: pointer;
+  transition: border-color 0.13s, color 0.13s, background 0.13s;
+}
+.mindmap-fallback-item:hover { border-color: var(--border2); color: var(--text); }
+.mindmap-fallback-item.is-done {
+  border-color: var(--success);
+  color: var(--success);
+  background: var(--success-dim);
+}
+
+@media (max-width: 760px) {
+  .roadmap-mindmap { display: none; }
+  .roadmap-mindmap-fallback { display: block; }
+  .roadmap-hero.roadmap-hero--full { min-height: 0; justify-content: flex-start; }
+}

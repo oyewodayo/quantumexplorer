@@ -1,0 +1,484 @@
+/* Circuits tab (js/tabs/circuit-tab.js, circuit-multiqubit-tab.js,
+   classical-circuit-tab.js) — shared across all four sub-builders
+   (Classical, 1Q, 2Q, 3Q) since they're all reachable from one tab.
+   Depends on: ../base.css, ../components.css (.section-label, .btn-run,
+   .card, .muted-text), ../bloch.css. */
+
+.circuit-layout { max-width: 960px; margin: 0 auto; }
+
+.circuit-top {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 22px;
+  align-items: start;
+}
+
+/* min-width:0 overrides the grid item's default min-width:auto — without
+   it, the circuit2-diagram's large min-content width (it's fixed-column
+   and horizontally scrollable on its own) propagates up through this
+   flex/grid chain and forces the whole page wider instead of letting
+   the diagram's own overflow-x:auto handle it. */
+.circuit-left { display: flex; flex-direction: column; gap: 13px; min-width: 0; }
+
+.circuit-palette { display: flex; gap: 7px; flex-wrap: wrap; }
+
+.circuit-gate-btn {
+  padding: 9px 14px;
+  border-radius: 7px;
+  border: 1px solid;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: var(--surface2) var(--sheen-metal);
+  transition: transform 0.11s, box-shadow 0.11s;
+}
+.circuit-gate-btn:hover { transform: scale(1.07); box-shadow: 0 0 13px currentColor; }
+.classical-gate-btn.active-gate {
+  background: var(--zero);
+  border-color: var(--zero);
+  color: #fff;
+}
+
+/* ─── CLASSICAL GATE SYMBOLS ─────────────────────────── */
+/* Real schematic glyphs (see classicalGateIconSVG() in
+   classical-circuit-tab.js) instead of plain gate-name text — used by
+   both the Classical Gates tab's palette and this tab's own palette.
+   Scoped to this modifier class rather than touching .circuit-gate-btn's
+   own layout, since that base class is shared with the quantum circuit
+   builders' plain-letter gate buttons. */
+.classical-gate-palette-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 10px 7px;
+  color: var(--text2);
+}
+.classical-gate-palette-btn:hover { color: var(--text); }
+.classical-gate-icon { display: block; color: inherit; }
+.classical-gate-palette-btn .classical-gate-icon { width: 42px; height: auto; }
+.circuit-gate-btn-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: inherit;
+}
+
+/* ─── HALF ADDER CIRCUIT (drag-and-drop, unlimited gates) ─ */
+/* Palette buttons are draggable (see initHalfAdderCircuit() in
+   classical-circuit-tab.js) — .is-armed marks whichever one was clicked
+   instead of dragged, so click-to-place has the same "something is
+   selected" feedback a real drag gives for free via the browser's own
+   drag image. */
+.circuit-gate-btn[draggable="true"] { cursor: grab; }
+.circuit-gate-btn.is-armed {
+  outline: 2px solid var(--zero);
+  outline-offset: 2px;
+}
+
+.halfadder-circuit-wrap {
+  width: 100%;
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: 2px dashed var(--border2);
+  border-radius: 10px;
+  background: var(--bg);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.halfadder-circuit-wrap:hover { border-color: var(--text3); }
+.halfadder-circuit-wrap:focus-visible { outline: 2px solid var(--zero); outline-offset: 2px; }
+.halfadder-circuit-wrap.drag-over { border-color: var(--zero); background: var(--zero-dim); }
+/* A drop the board can't use (currently: any 1-input gate — every row
+   here needs to read both A and B) — flashes red and shakes right where
+   the user was looking, since the actual explanation lands in the
+   explainer card below the palette, out of the eyeline of someone
+   watching the board itself. See flashHalfAdderRejected() in
+   classical-circuit-tab.js. */
+.halfadder-circuit-wrap.drop-rejected {
+  border-color: var(--danger);
+  background: var(--danger-dim);
+  animation: ha-reject-shake 0.5s;
+}
+@keyframes ha-reject-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(2px); }
+}
+#halfadder-circuit-svg { display: block; width: 100%; height: auto; color: var(--text); }
+
+/* ─── MINI BLOCH SPHERES (2Q/3Q circuit builders) ────── */
+.mini-bloch-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.mini-bloch { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.mini-bloch-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text2);
+}
+
+/* ─── TRY ME PRESETS ─────────────────────────────────── */
+.try-me-toggle {
+  background: var(--accent-dim);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  padding: 7px 13px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.86rem;
+  font-weight: 600;
+  transition: all 0.13s;
+}
+.try-me-toggle:hover { color: var(--text); border-color: var(--zero); }
+.try-me-toggle.active { color: var(--zero); border-color: var(--zero); background: var(--accent-glow); }
+
+.try-me-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 8px;
+}
+.try-preset-btn {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.82rem;
+  transition: all 0.13s;
+}
+.try-preset-btn:hover { border-color: var(--zero); color: var(--zero); transform: scale(1.04); }
+
+/* ─── CLASSICAL CIRCUIT BUILDER ──────────────────────── */
+.truth-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+}
+.truth-table th, .truth-table td {
+  border: 1px solid var(--border);
+  padding: 7px 10px;
+  text-align: center;
+  color: var(--text2);
+}
+.truth-table th {
+  background: var(--surface2);
+  color: var(--text);
+  font-weight: 600;
+}
+.truth-table tr.truth-row-active td {
+  background: var(--zero-dim);
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* ─── 3-QUBIT CNOT PICKER ────────────────────────────── */
+.cnot3-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.cnot3-select {
+  padding: 7px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+}
+.cnot3-arrow { color: var(--text3); font-weight: 600; }
+
+.wire-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 15px 13px;
+  box-shadow: var(--shadow-sm);
+}
+.wire-ket {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  color: var(--text2);
+  white-space: nowrap;
+}
+.wire-track { flex: 1; position: relative; padding: 14px 0; }
+.wire-line {
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 1px;
+  background: var(--border2);
+  transform: translateY(-50%);
+}
+.gate-slots {
+  display: flex;
+  gap: 6px;
+  position: relative;
+  z-index: 1;
+  flex-wrap: wrap;
+}
+.gate-slot {
+  width: 50px; height: 50px;
+  border: 1px dashed var(--border2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: var(--bg);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.13s;
+  position: relative;
+}
+.gate-slot.empty:hover { border-color: var(--text3); background: var(--surface); }
+.gate-slot.filled { border-style: solid; background: var(--surface) var(--sheen-metal); }
+.gate-slot.running { box-shadow: 0 0 18px currentColor; transform: scale(1.1); }
+
+/* A placed classical gate drops the generic filled-slot box in favor of
+   its own schematic symbol sitting directly on the wire (item: "actual
+   looking circuit") — wider than the default 50px square since a gate
+   symbol reads better wide than tall, and borderless/transparent so the
+   shared .wire-line behind it looks like it flows straight into the
+   symbol's own input/output stubs instead of being boxed off. Scoped to
+   #classical-gate-slots specifically so the quantum 1-qubit circuit's
+   plain-letter slots (same .gate-slot/.filled classes) are untouched. */
+#classical-gate-slots .gate-slot.classical-gate-slot-filled {
+  width: 66px;
+  border: none;
+  background: none;
+  color: var(--text);
+  padding: 0;
+}
+#classical-gate-slots .gate-slot.classical-gate-slot-filled:hover {
+  background: var(--accent-dim);
+  border-radius: 8px;
+}
+#classical-gate-slots .gate-slot.classical-gate-slot-filled.running {
+  background: var(--accent-glow);
+  border-radius: 8px;
+}
+#classical-gate-slots .classical-gate-icon { width: 100%; height: auto; }
+
+/* First-slot "+" cue shown only while the wire is completely empty, so
+   it's obvious clicking a palette gate above is what fills these in. */
+.gate-slot-hint {
+  color: var(--text3);
+  font-size: 1.1rem;
+  font-weight: 400;
+  animation: gate-slot-hint-pulse 2s ease-in-out infinite;
+}
+@keyframes gate-slot-hint-pulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gate-slot-hint { animation: none; }
+}
+
+/* ─── 2-QUBIT CIRCUIT DIAGRAM ────────────────────────── */
+/* A real textbook-style two-wire diagram (not a flat tag list): each
+   gates[] entry (see renderDiagram() in circuit-multiqubit-tab.js) is one
+   column shared by both grid rows, so a CNOT's control dot, target ⊕,
+   and connecting line all line up exactly under each other for free,
+   just by placing three items in the same grid-column across different
+   grid-rows. */
+.circuit2-diagram-wrap { overflow-x: auto; }
+.circuit2-diagram {
+  display: grid;
+  grid-template-columns: 40px repeat(10, 46px);
+  grid-template-rows: 48px 48px;
+  align-items: center;
+  justify-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+  width: max-content;
+  min-width: 100%;
+}
+/* Same visual treatment as .circuit2-diagram, just one more wire — see
+   renderDiagram() in circuit-multiqubit-tab.js, which reuses these same
+   cell/gate/cnot-dot/cnot-target/cnot-line classes for both panel sizes
+   since none of those hardcode a row count, only the grid container
+   itself does. */
+.circuit3-diagram {
+  display: grid;
+  grid-template-columns: 40px repeat(10, 46px);
+  grid-template-rows: 48px 48px 48px;
+  align-items: center;
+  justify-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+  width: max-content;
+  min-width: 100%;
+}
+
+.circuit2-ket {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  color: var(--text2);
+  justify-self: start;
+}
+
+.circuit2-wire {
+  justify-self: stretch;
+  height: 1px;
+  background: var(--border2);
+}
+
+.circuit2-cell {
+  width: 38px;
+  height: 38px;
+  z-index: 1;
+  padding: 0;
+  cursor: default;
+}
+.circuit2-cell.empty {
+  border: 1px dashed var(--border2);
+  border-radius: 8px;
+  background: var(--bg);
+}
+.circuit2-cell.circuit2-cell-hint {
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  animation: gate-slot-hint-pulse 2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .circuit2-cell-hint { animation: none; }
+}
+
+.circuit2-gate {
+  border: 1px solid;
+  border-radius: 8px;
+  background: var(--surface2) var(--sheen-metal);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.11s, box-shadow 0.11s;
+}
+.circuit2-gate:hover { transform: scale(1.08); box-shadow: 0 0 14px currentColor; }
+.circuit2-gate.running { box-shadow: 0 0 18px currentColor; transform: scale(1.12); }
+
+.circuit2-cnot-line {
+  align-self: stretch;
+  width: 2px;
+  background: var(--text2);
+  z-index: 0;
+}
+.circuit2-cnot-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text);
+  border: none;
+  cursor: pointer;
+}
+.circuit2-cnot-target {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--text);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.circuit2-cnot-dot:hover, .circuit2-cnot-target:hover { box-shadow: 0 0 12px var(--text2); }
+.circuit2-cnot-dot.running, .circuit2-cnot-target.running { box-shadow: 0 0 18px var(--zero); }
+
+/* ─── HALF ADDER COMPARE PANEL — QUANTUM DIAGRAM ─────── */
+/* renderCompareQuantumDiagram() (classical-circuit-tab.js) builds this
+   as a fixed, non-interactive reference circuit reusing the .circuit2-*
+   grid classes above, plus these three: a measurement box, its dashed
+   drop to the classical register, and the doubled classical wire itself
+   — none of which the live 2Q/3Q builders need since they never measure. */
+.ha-quantum-diagram {
+  display: grid;
+  grid-template-columns: 36px repeat(6, 44px);
+  grid-template-rows: 44px 44px 44px 44px 40px;
+  align-items: center;
+  justify-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+  width: max-content;
+  min-width: 100%;
+}
+.ha-classical-wire {
+  justify-self: stretch;
+  height: 5px;
+  border-top: 1px solid var(--border2);
+  border-bottom: 1px solid var(--border2);
+}
+.ha-meter {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  background: var(--surface2) var(--sheen-metal);
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ha-meter-drop {
+  align-self: stretch;
+  width: 0;
+  border-left: 2px dashed var(--text3);
+  z-index: 0;
+}
+.ha-meter-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text2);
+}
+
+.circuit-actions { display: flex; align-items: center; gap: 8px; }
+
+.circuit-output-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  box-shadow: var(--shadow-md);
+}

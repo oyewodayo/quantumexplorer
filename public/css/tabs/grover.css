@@ -1,0 +1,80 @@
+/* Grover's Search tab (js/tabs/grover-tab.js) — the target picker's
+   controls/chart grid, the circuit diagram's ambient-glow stagger, and
+   the 4-column amplitude chart's sign badges. Depends on: ../base.css,
+   ../components.css (.card, .btn-run, .btn-secondary, .muted-text,
+   .mode-grid/.mode-btn/.preset-btn, .bit-explainer, .histogram/.hist-col/
+   .hist-track/.hist-bar/.ket/.pct), ../tabs/bell-states.css
+   (.circuit-gate and its always-on circuit-gate-glow keyframes — reused
+   as-is for the Oracle/Diffuser/H gates' idle "alive" look), ../tabs/
+   teleport.css (.teleport-stage/.active for the one-shot per-stage
+   spotlight pulseGroverStage() fires during a run; .teleport-histogram,
+   .teleport-bits-row/-bit-chip/-label/-val for the Marked item/Found
+   chips, reused as Teleport's own sent/decoded chip shape). */
+
+/* Same staggered-glow idea as Bell States' own circuit (bell-states.css)
+   — left-to-right through the actual gate order (H⊗H, Oracle, then the
+   diffuser's own H, reflection, H), so the seven gates read as one
+   continuous idle "signal flow" rather than blinking in unison. Applies
+   to both circuits — ids are distinct per mode (N=4 unsuffixed, N=8
+   "-n8"), and only the visible one's animation is ever seen since the
+   other sits at display:none. */
+#grover-gate-h0             { animation-delay: 0s; }
+#grover-gate-h1             { animation-delay: 0.1s; }
+#grover-gate-oracle         { animation-delay: 0.6s; }
+#grover-gate-diffuse-h0a    { animation-delay: 1.2s; }
+#grover-gate-diffuse-h1a    { animation-delay: 1.3s; }
+#grover-gate-reflect        { animation-delay: 1.7s; }
+#grover-gate-diffuse-h0b    { animation-delay: 2.3s; }
+#grover-gate-diffuse-h1b    { animation-delay: 2.4s; }
+
+#grover-gate-h0-n8          { animation-delay: 0s; }
+#grover-gate-h1-n8          { animation-delay: 0.1s; }
+#grover-gate-h2-n8          { animation-delay: 0.2s; }
+#grover-gate-oracle-n8      { animation-delay: 0.7s; }
+#grover-gate-diffuse-h0a-n8 { animation-delay: 1.4s; }
+#grover-gate-diffuse-h1a-n8 { animation-delay: 1.5s; }
+#grover-gate-diffuse-h2a-n8 { animation-delay: 1.6s; }
+#grover-gate-reflect-n8     { animation-delay: 2.1s; }
+#grover-gate-diffuse-h0b-n8 { animation-delay: 2.8s; }
+#grover-gate-diffuse-h1b-n8 { animation-delay: 2.9s; }
+#grover-gate-diffuse-h2b-n8 { animation-delay: 3.0s; }
+
+/* The 8-column chart needs a tighter gap and smaller |ket⟩/pct labels
+   than the 4-column default (.teleport-histogram) to keep every column
+   readable rather than crowding three-digit labels off a full-width bar
+   set at the same spacing as a four-column one. */
+.grover-histogram-n8 {
+  gap: 6px;
+  height: 90px;
+}
+.grover-histogram-n8 .ket,
+.grover-histogram-n8 .pct {
+  font-size: 0.72rem;
+}
+.grover-histogram-n8 .grover-sign {
+  font-size: 0.72rem;
+}
+
+.grover-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 14px;
+}
+@media (max-width: 760px) {
+  .grover-controls-grid { grid-template-columns: 1fr; }
+}
+
+/* One +/− badge per bar, sitting between the bar itself and its |ket⟩
+   label — the only visible trace of the oracle's phase flip, since the
+   bar's own height (a probability) is identical either way. Neutral
+   color by default; only tinted once a bar actually carries a negative
+   amplitude, so a fresh/reset chart (every sign at "+") doesn't imply a
+   claim about phase that hasn't happened yet. */
+.grover-sign {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text3);
+  min-height: 1.1em;
+}
+.grover-sign.grover-sign-neg { color: var(--action-measure); }

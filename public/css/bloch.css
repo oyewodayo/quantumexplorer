@@ -1,0 +1,75 @@
+/* Bloch sphere canvas chrome — the card wrapper, hover tooltip, and the
+   pulse animation fired alongside a gate application. The sphere's own
+   3D rendering lives in js/core/bloch-renderer.js, not here; this file
+   is only the surrounding DOM/CSS. Depends on: base.css. */
+
+/* ─── BLOCH SPHERE WRAP ──────────────────────────────── */
+.bloch-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow-md);
+  transition: background 0.28s, border-color 0.28s, box-shadow 0.28s;
+}
+
+/* Fires alongside .gate-btn.pulsing when a gate is applied, so the
+   click and the sphere's resulting rotation read as one connected
+   action rather than a click somewhere and a shape changing elsewhere. */
+@keyframes bloch-wrap-pulse {
+  0%   { box-shadow: var(--shadow-md), 0 0 0 0 var(--zero-dim); }
+  40%  { box-shadow: var(--shadow-md), 0 0 0 10px var(--zero-dim); }
+  100% { box-shadow: var(--shadow-md), 0 0 0 0 transparent; }
+}
+.bloch-wrap.pulsing { animation: bloch-wrap-pulse 0.55s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .bloch-wrap.pulsing { animation: none; }
+}
+
+canvas { display: block; }
+
+/* Every Bloch sphere that's actually draggable — the main Qubit tab, the
+   Two/Three Qubit tabs' per-qubit spheres, and Alice's message qubit on
+   the Teleport tab (see app.js's enableDrag() calls) — carries this
+   modifier on its .bloch-wrap; the Gates/Circuit/Bob/Noise spheres are
+   read-only outputs and stay plain, with none of this: no grab cursor,
+   no hover lift, nothing implying they can be dragged. */
+.bloch-wrap--drag {
+  transition: background 0.28s, border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+}
+.bloch-wrap--drag:hover {
+  border-color: var(--zero);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.18), var(--shadow-sm);
+  transform: translateY(-3px);
+}
+.bloch-wrap--drag canvas { cursor: grab; touch-action: none; border-radius: 8px; }
+.bloch-wrap--drag canvas.dragging { cursor: grabbing; }
+.bloch-wrap--drag canvas:focus-visible { outline: 2px solid var(--zero); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .bloch-wrap--drag:hover { transform: none; }
+}
+
+/* ─── BLOCH TOOLTIP (hover over an axis label) ───────── */
+.bloch-tooltip {
+  position: fixed;
+  pointer-events: none;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  padding: 7px 10px;
+  border-radius: 7px;
+  max-width: 220px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+  opacity: 0;
+  transform: translate(-50%, -100%);
+  transition: opacity 0.12s;
+  z-index: 200;
+}
+.bloch-tooltip.visible { opacity: 1; }

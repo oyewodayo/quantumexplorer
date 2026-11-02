@@ -1,0 +1,356 @@
+/* Page chrome: the fixed header, the floating tab-dock sidebar, the
+   generic .tab-content wrapper every simulation tab sits inside, and the
+   page footer.
+   Depends on: base.css (theme variables, --header-h/--dock-clear/--tab-strip-h). */
+
+/* ─── HEADER ─────────────────────────────────────────── */
+header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  background: var(--bg);
+  box-shadow: var(--header-shadow);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 16px;
+  z-index: 100;
+  transition: background 0.28s, box-shadow 0.28s;
+}
+
+.logo {
+  min-width: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+.logo a { display: block; }
+/* The Quantum Explorer badge (icons/quantum-explorer.svg), rounded like an
+   app icon. */
+.logo-badge {
+  position: relative;
+  display: block;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.logo-badge-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ─── FOOTER ─────────────────────────────────────────── */
+/* Sits at the bottom of whichever page is currently visible (a sibling of
+   #roadmap-view/.tab-content, not inside either) — mirrors the header's
+   own branding language (.logo-badge, JetBrains Mono small-caps
+   labels) at a smaller scale, rather than being unstyled plain text. */
+.app-footer {
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+  padding: 28px 24px 22px;
+}
+.app-footer-top {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.app-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+/* Same badge, scaled down (32px vs. the header's 40px). */
+.app-footer-badge {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+.app-footer-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.app-footer-tagline {
+  font-size: 0.76rem;
+  color: var(--text3);
+  margin-top: 2px;
+}
+.app-footer-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  color: var(--text2);
+  text-decoration: none;
+  padding: 7px 12px;
+  border: 1px solid var(--border2);
+  border-radius: 7px;
+  transition: all 0.14s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.app-footer-link:hover {
+  color: var(--text);
+  border-color: var(--text2);
+  background: var(--surface2);
+}
+.app-footer-bottom {
+  max-width: 1080px;
+  margin: 18px auto 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  color: var(--text4);
+}
+
+/* ─── SIMULATION TAB DOCK ────────────────────────────── */
+/* A floating column of pill buttons, vertically centered on the left
+   edge and pinned there while the page (not this element) scrolls —
+   replaces the old horizontal header <nav>. Deliberately not a panel:
+   each pill pairs a mnemonic letter badge (Qubit, Gates, Circuit,
+   Measure, Statevec, Entangle, Tunnel, Interference are all distinct on
+   first letter) with its full label, always spelled out — never
+   abbreviated down to just the badge. A thin rail behind the badges reads
+   as a path/route, echoing the "circuits are a route" language used in
+   the Roadmap lesson text. Only shown in Concepts app-mode (display
+   toggled by setAppMode() in roadmap.js, same convention the old nav
+   used). */
+#tab-sidebar {
+  position: fixed;
+  left: 18px;
+  /* Pinned to the top (not vertically centered) precisely so Introduction
+     — the first pill — sits at a fixed, predictable spot no matter how
+     many subnav groups below it are expanded. Centering + a max-height
+     cap was tried first, but centering math re-derives the box's
+     position from its own (post-cap) height on every layout change,
+     which in practice still left the top pill scrolled out of view with
+     no visible scrollbar to hint at why. top+bottom instead gives the
+     box a height implicitly (viewport minus these two offsets), which
+     both bounds it AND keeps its top edge anchored. */
+  top: calc(var(--header-h) + 20px);
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  z-index: 90;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Visible (not auto-hiding) on purpose — with 15 tabs plus expandable
+     subnavs, the dock can run taller than the viewport, and a hidden
+     scrollbar left no visible cue that there was more to scroll to (see
+     the top-anchoring comment above, which worked around the symptom
+     without fixing the actual cause). Thin and theme-colored rather than
+     the browser's bare default, so it still reads as designed. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+  padding: 4px 6px 4px 2px;
+}
+#tab-sidebar::-webkit-scrollbar { width: 7px; }
+#tab-sidebar::-webkit-scrollbar-track { background: transparent; }
+#tab-sidebar::-webkit-scrollbar-thumb {
+  background: var(--border2);
+  border-radius: 4px;
+}
+#tab-sidebar::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+#tab-sidebar::before {
+  content: '';
+  position: absolute;
+  left: 17px;
+  top: 18px;
+  bottom: 18px;
+  width: 2px;
+  background: var(--border2);
+  z-index: -1;
+}
+
+#tab-sidebar .tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 42px;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.18s;
+}
+#tab-sidebar .tab:hover {
+  border-color: var(--border2);
+  color: var(--text);
+  background: var(--surface2);
+  transform: translateX(3px);
+}
+#tab-sidebar .tab.active {
+  background: var(--zero);
+  border-color: var(--zero);
+  color: #fff;
+  box-shadow: var(--shadow-md);
+}
+#tab-sidebar .tab:focus-visible { outline: 2px solid var(--zero); outline-offset: 2px; }
+
+#tab-sidebar .tab-badge {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+#tab-sidebar .tab-label {
+  padding-right: 16px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ─── SIDEBAR SUBNAV ─────────────────────────────────── */
+/* A .tab-group wraps a top-level pill that has real sub-destinations
+   (Bits & Qubits, Maths Concept, Gates) plus its .tab-subnav list.
+   Collapsed by default; the chevron toggles .open without navigating,
+   while clicking the pill itself still navigates AND opens its own
+   group — same split as the mind-map's toggle-vs-node click handling in
+   roadmap.js (goToLessonSimulation vs the [data-mindmap-toggle] check). */
+#tab-sidebar .tab-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+#tab-sidebar .tab-chevron {
+  flex-shrink: 0;
+  margin-right: 14px;
+  font-size: 0.7rem;
+  opacity: 0.7;
+  transition: transform 0.18s;
+}
+#tab-sidebar .tab-group.open .tab-chevron { transform: rotate(90deg); }
+
+#tab-sidebar .tab-subnav {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  margin-left: 20px;
+  padding-left: 12px;
+  border-left: 1px solid var(--border2);
+}
+#tab-sidebar .tab-group.open .tab-subnav { display: flex; }
+
+#tab-sidebar .tab-sub {
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+#tab-sidebar .tab-sub:hover {
+  border-color: var(--border2);
+  color: var(--text);
+  background: var(--surface2);
+}
+#tab-sidebar .tab-sub.active {
+  background: var(--zero);
+  border-color: var(--zero);
+  color: #fff;
+}
+#tab-sidebar .tab-sub:focus-visible { outline: 2px solid var(--zero); outline-offset: 2px; }
+
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.header-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.74rem;
+  color: var(--text4);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.theme-toggle {
+  width: 32px; height: 32px;
+  border-radius: 7px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.14s;
+  flex-shrink: 0;
+}
+.theme-toggle:hover { border-color: var(--text2); color: var(--text); background: var(--surface2); }
+
+.lang-select {
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 7px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.lang-select:hover { border-color: var(--text2); color: var(--text); background: var(--surface2); }
+
+/* Header Concepts/Roadmap switch — sits between the logo and
+   .header-right, so it stays visible regardless of which mode is active. */
+.app-mode-grid { max-width: 260px; white-space: nowrap; flex-shrink: 0; }
+
+/* ─── TAB CONTENT ────────────────────────────────────── */
+.tab-content {
+  display: none;
+  /* Left padding clears the #tab-sidebar dock (only ever visible together
+     with this element — both are Concepts-mode-only) rather than the
+     ordinary 24px side padding used everywhere else. */
+  padding: calc(var(--header-h) + 28px) 24px 40px var(--dock-clear);
+  min-height: 100vh;
+}
+.tab-content.active { display: block; animation: tab-fade-in 0.22s ease; }
+
+@keyframes tab-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tab-content.active { animation: none; }
+}
+
+/* Lesson + quick-check, appended at the bottom of each concept's own
+   simulation tab (see #lesson-embed-<tab> in index.html and
+   renderEmbeddedLessons() in roadmap.js) — a visual break from the
+   simulation above it, rather than another .card in the same flow. */
+.lesson-embed {
+  max-width: 720px;
+  margin: 40px auto 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}

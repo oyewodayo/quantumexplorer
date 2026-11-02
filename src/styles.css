@@ -1,0 +1,9 @@
+/* Load Tailwind's design tokens and utilities without its global reset.
+   The existing simulation UI has a mature stylesheet that remains in use
+   until those screens are migrated to React. */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@source "./App.jsx";
+@source "./components";
+@source "./main.jsx";

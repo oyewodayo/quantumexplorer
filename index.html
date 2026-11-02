@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4f6f8" />
+    <title>Quantum Explorer · Learn Quantum Computing Interactively</title>
+    <meta name="description" content="Quantum Explorer is a free interactive platform for learning quantum computing and quantum mechanics: Bloch sphere, qubits, gates, circuits, entanglement, teleportation, Grover search and more." />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Quantum Explorer" />
+    <meta property="og:title" content="Quantum Explorer · Learn Quantum Computing Interactively" />
+    <meta property="og:description" content="Quantum Explorer is a free interactive platform for learning quantum computing and quantum mechanics: Bloch sphere, qubits, gates, circuits, entanglement, teleportation, Grover search and more." />
+    <meta property="og:image" content="/icons/quantum-explorer.svg" />
+    <meta name="twitter:card" content="summary" />
+    <script type="application/ld+json">
+      {"@context":"https://schema.org","@type":"LearningResource","name":"Quantum Explorer","description":"Quantum Explorer is a free interactive platform for learning quantum computing and quantum mechanics: Bloch sphere, qubits, gates, circuits, entanglement, teleportation, Grover search and more.","learningResourceType":"Interactive simulation","educationalLevel":"Beginner to intermediate","inLanguage":["en","fr","es"],"isAccessibleForFree":true,"teaches":["Qubits and the Bloch sphere","Quantum gates and circuits","Entanglement and Bell states","Quantum tunneling and interference","Quantum teleportation and superdense coding","Grover's search algorithm"]}
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/icons/quantum-explorer.svg" />
+    <script>
+      try {
+        const theme = localStorage.getItem('qe-theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch { /* Storage can be unavailable in private browsing. */ }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="root">
+      <main style="max-width:720px;margin:40px auto;padding:0 16px;font-family:system-ui,sans-serif">
+        <h1>Quantum Explorer</h1>
+        <p>Quantum Explorer is a free interactive platform for learning quantum computing and quantum mechanics: Bloch sphere, qubits, gates, circuits, entanglement, teleportation, Grover search and more.</p>
+        <ul>
+          <li><a href="/?tab=qubit">Bits &amp; Qubits</a></li>
+          <li><a href="/?tab=mathsconcept">Maths Concept</a></li>
+          <li><a href="/?tab=gates">Quantum Gates</a></li>
+          <li><a href="/?tab=circuit">Circuits</a></li>
+          <li><a href="/?tab=measure">Measurement</a></li>
+          <li><a href="/?tab=entangle">Entanglement</a></li>
+          <li><a href="/?tab=bellstates">Bell States</a></li>
+          <li><a href="/?tab=tunnel">Quantum Tunneling</a></li>
+          <li><a href="/?tab=interference">Interference</a></li>
+          <li><a href="/?tab=beamsplitter">Beam Splitter</a></li>
+          <li><a href="/?tab=sterngerlach">Stern–Gerlach Experiment</a></li>
+          <li><a href="/?tab=teleport">Quantum Teleportation</a></li>
+          <li><a href="/?tab=superdense">Superdense Coding</a></li>
+          <li><a href="/?tab=noise">Noise &amp; Decoherence</a></li>
+          <li><a href="/?tab=grover">Grover's Search</a></li>
+        </ul>
+        <noscript>Quantum Explorer needs JavaScript to run its interactive simulations.</noscript>
+      </main>
+    </div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -1,0 +1,174 @@
+/* Bell States tab (js/tabs/bell-states-tab.js) — the four-way picker reuses
+   .mode-grid/.mode-btn (components.css), and the probability bars reuse
+   the Entangle tab's own .entangle-stats/.prob-row/.track/.fill markup
+   (tabs/entanglement.css) — but driven by the exact Born-rule split for
+   the selected state (50/50 on its two possible kets), not by repeated
+   sampling, since the interactive measure-both/measure-A demo itself
+   already lives on the Entangle tab and doesn't need repeating here.
+   Depends on: ../components.css (.card, .mode-grid/.mode-btn, .formula,
+   .prob-row/.track/.fill/.ket/.pct, .quantum-list), ../tabs/entanglement.css
+   (.entangle-stats). */
+
+.bellstates-layout {
+  max-width: 680px;
+  margin: 0 auto;
+  /* Decorative-only accent for the Run animation's "entangled" look
+     (bell-states-tab.js's .entangled/.bellstate-entangle-link) — scoped
+     here rather than a base.css variable since nothing outside this tab
+     uses it, same reasoning as the CNOT_HIST_COLOR/TOFFOLI_HIST_COLOR
+     fixed hex constants in circuit-multiqubit-tab.js. */
+  --bell-entangle: #A78BFA;
+}
+
+/* Neutral fill/ket color for |01⟩/|10⟩ rows — neither the all-zeros nor
+   all-ones outcome, so .zero-fill/.one-fill (and .zero-color/.one-color)
+   don't apply; pairs with the existing .mid-color already defined in
+   components.css for the same "neither" case. */
+.mid-fill { background: var(--text2); }
+
+/* Dims whichever two kets are impossible for the currently-selected Bell
+   state (toggled in JS as the picker changes). */
+.prob-row.bell-impossible {
+  opacity: 0.35;
+}
+
+/* ─── CIRCUIT DIAGRAM ────────────────────────────────────
+   The two X gates (#bellstate-gate-xa/-xb) fade out via .circuit-gate-off
+   when the selected state doesn't need them; H and CNOT stay put for all
+   four states. A looping, staggered glow sweeps left-to-right across
+   whichever gates are currently on — purely decorative "signal flow",
+   replacing the old click-to-fire demo with something that's alive
+   without needing a button. */
+.circuit-gate {
+  transition: opacity 0.25s ease;
+  transform-origin: center;
+}
+.circuit-gate.circuit-gate-off {
+  opacity: 0.12;
+}
+.circuit-gate:not(.circuit-gate-off) {
+  animation: circuit-gate-glow 2.4s ease-in-out infinite;
+}
+#bellstate-gate-xa, #bellstate-gate-xb { animation-delay: 0s; }
+#bellstate-gate-h                     { animation-delay: 0.5s; }
+#bellstate-gate-cnot                  { animation-delay: 1s; }
+
+@keyframes circuit-gate-glow {
+  0%, 60%, 100% { filter: drop-shadow(0 0 0 transparent); }
+  20% { filter: drop-shadow(0 0 5px var(--zero)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .circuit-gate:not(.circuit-gate-off) { animation: none; }
+}
+
+/* ─── CIRCUIT DIAGRAM — RUN ANIMATION ────────────────────
+   #btn-run-bellstate drives runBellStateCircuit() (bell-states-tab.js),
+   which slides these two token groups (#bellstate-token-a/-b) along the
+   wires via style.transform (transitioned below), pausing at each gate's
+   x-position to show that gate's real effect: .token-pulse flashes on an
+   X flip, .superposed swaps the solid dot for a spinning dashed ring once
+   H (or the entangling CNOT) actually puts that wire into a genuine
+   superposition, and .entangled tints both tokens the same accent once
+   CNOT correlates them — paired with #bellstate-entangle-link, a dashed
+   arc that fades in at the very end. Additive to the always-on
+   .circuit-gate-glow above, which keeps looping as ambient decoration
+   whether or not a run is in progress. */
+.bellstate-token {
+  transition: transform 0.6s ease;
+}
+.bellstate-token.token-hidden { opacity: 0; }
+.bellstate-token .token-dot {
+  transition: fill 0.3s ease, stroke 0.3s ease, r 0.25s ease;
+}
+.bellstate-token .token-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  fill: #fff;
+  text-anchor: middle;
+  transition: opacity 0.2s ease;
+}
+.bellstate-token.token-pulse .token-dot { animation: bell-token-pulse 0.5s ease; }
+@keyframes bell-token-pulse {
+  0%, 100% { r: 12; }
+  50% { r: 16; }
+}
+.bellstate-token.superposed .token-dot {
+  fill: var(--surface);
+  stroke: var(--text2);
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+  animation: bell-token-spin 1.6s linear infinite;
+}
+.bellstate-token.superposed .token-label { font-size: 10px; fill: var(--text); }
+@keyframes bell-token-spin {
+  to { stroke-dashoffset: -14; }
+}
+/* Comes after .superposed so it wins the stroke color at equal
+   specificity — both classes are present together from the CNOT step
+   onward (see runBellStateCircuit()), tinting the already-dashed ring
+   instead of replacing its shape. */
+.bellstate-token.entangled .token-dot { stroke: var(--bell-entangle); }
+.bellstate-entangle-link {
+  fill: none;
+  stroke: var(--bell-entangle);
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.bellstate-entangle-link.shown {
+  opacity: 0.85;
+  animation: bell-token-spin 1s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bellstate-token { transition: none; }
+  .bellstate-token.token-pulse .token-dot,
+  .bellstate-token.superposed .token-dot,
+  .bellstate-entangle-link.shown { animation: none; }
+}
+
+/* ─── BELL FAMILY GRID ───────────────────────────────────
+   A 2x2 taxonomy of the four states — row = same vs. opposite outcomes,
+   column = relative phase — with a leading corner cell and header row/
+   column, so it reads like a small table. Each state cell is also a live
+   [data-bell] selector, same as the picker above; clicking either stays
+   in sync (bell-states-tab.js's setBellState() toggles .active on both). */
+.bell-family-grid {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  gap: 8px;
+  max-width: 380px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.bell-family-corner { }
+.bell-family-colhead, .bell-family-rowhead {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+.bell-family-rowhead { justify-content: flex-end; padding-right: 6px; }
+.bell-family-cell {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding: 14px 0;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+.bell-family-cell:hover { border-color: var(--zero); transform: translateY(-1px); }
+.bell-family-cell.active {
+  background: var(--zero);
+  border-color: var(--zero);
+  color: #fff;
+}

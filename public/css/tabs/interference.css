@@ -1,0 +1,77 @@
+/* Interference tab (js/tabs/interference-tab.js) — the ripple canvas +
+   detector screen layout. The shared segmented mode-grid control this
+   tab also uses (Double/Single/Which-path) lives in ../components.css,
+   not here, since Circuits/Bits/Gates/StateVector reuse the exact same
+   .mode-grid/.mode-btn classes. Depends on: ../base.css,
+   ../components.css. */
+
+.interference-layout {
+  max-width: 960px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+  align-items: start;
+}
+
+.interference-main {
+  display: flex;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: var(--shadow-md);
+  transition: background 0.28s, border-color 0.28s, box-shadow 0.28s;
+}
+
+.ripple-wrap {
+  flex: 1;
+  min-width: 0; /* let this flex item shrink below the canvas's native
+                   360px width instead of forcing the page wider */
+  display: flex;
+  justify-content: center;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* Scales down visually on narrow screens (same pattern as #tunnel-canvas)
+   without touching the canvas's actual drawing resolution (360×260,
+   set via its width/height attributes in index.html and read directly
+   by interference-tab.js) — the simulation keeps full internal
+   fidelity, only the on-screen size shrinks. */
+#ripple-canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+.screen-wrap {
+  width: 86px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+#screen-canvas {
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.screen-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+@media (max-width: 920px) {
+  .interference-layout { grid-template-columns: 1fr; }
+  .interference-main { flex-direction: column; align-items: center; }
+  .screen-wrap { width: 100%; max-width: 360px; }
+  #screen-canvas { width: 100%; height: 120px; }
+}

@@ -1,0 +1,72 @@
+/* Superdense Coding tab (js/tabs/superdense-tab.js) — the protocol
+   circuit card, the message picker, and the sent/decoded bit chips.
+   Depends on: ../base.css, ../components.css (.card, .btn-run,
+   .btn-secondary, .muted-text, .mode-grid/.mode-btn, .bit-explainer),
+   ../tabs/bell-states.css (.circuit-gate/.circuit-gate-off — the two
+   encode gates toggle these the moment a message is picked, before Send
+   is even pressed, since (unlike Teleport's post-measurement correction)
+   which gates fire is chosen up front, not discovered), ../tabs/
+   teleport.css (.teleport-stage/.teleport-stage.active for the one-shot
+   stage spotlight, .teleport-bits-row/.teleport-bit-chip/-label/-val for
+   the sent/decoded bit display — same shape as Teleport's classical-bits
+   chips, reused as-is rather than redefined). */
+
+.superdense-layout {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.superdense-circuit-card { padding: 16px 16px 12px; box-shadow: var(--shadow-md); }
+
+#superdense-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.superdense-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.superdense-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 14px;
+}
+
+@media (max-width: 760px) {
+  .superdense-controls-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── QUANTUM CHANNEL SEGMENT ────────────────────────────
+   The one part of this diagram that isn't classical — Alice's physical
+   qubit actually travels here. Particles only drift while
+   superdense-tab.js has #superdense-channel in its "sending" beat;
+   otherwise the segment sits as a plain highlighted wire, same as the
+   rest of the diagram between animated runs. */
+.superdense-particle { opacity: 0; }
+.superdense-channel.sending .superdense-particle {
+  animation: superdense-particle-flow 1s linear infinite;
+}
+@keyframes superdense-particle-flow {
+  0%   { transform: translateX(0); opacity: 0; }
+  15%  { opacity: 0.9; }
+  85%  { opacity: 0.9; }
+  100% { transform: translateX(var(--dx)); opacity: 0; }
+}
+.superdense-channel.sending .superdense-channel-wire {
+  filter: drop-shadow(0 0 4px var(--zero));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .superdense-channel.sending .superdense-particle { animation: none; }
+}
