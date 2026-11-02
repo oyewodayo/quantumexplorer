@@ -18,7 +18,7 @@ Goal: replace `src/engine/engine.js` (about 12,000 lines of code that edits the 
 - [x] 1.4 Shared hooks: `useTheme`, `useI18n`, `useNav`, `useProgress`
 - [x] 1.5 App shell in React: header, Home toggle, sidebar, footer
 - [ ] 1.6 Convert the tabs one by one (each: component + state, then delete its code from the engine):
-  - [ ] Measure
+  - [x] Measure (`src/components/tabs/MeasureTab.jsx`)
   - [ ] Noise
   - [ ] Superdense Coding
   - [ ] Teleport

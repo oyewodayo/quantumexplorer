@@ -8,7 +8,7 @@ import MathsconceptTab from './components/generated/MathsconceptTab.jsx';
 import GatesTab from './components/generated/GatesTab.jsx';
 import CircuitTab from './components/generated/CircuitTab.jsx';
 import BellstatesTab from './components/generated/BellstatesTab.jsx';
-import MeasureTab from './components/generated/MeasureTab.jsx';
+import MeasureTab from './components/tabs/MeasureTab.jsx';
 import EntangleTab from './components/generated/EntangleTab.jsx';
 import TunnelTab from './components/generated/TunnelTab.jsx';
 import InterferenceTab from './components/generated/InterferenceTab.jsx';

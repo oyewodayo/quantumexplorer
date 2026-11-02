@@ -10,6 +10,8 @@ import { SIDEBAR_ITEMS } from '../components/sidebarItems.js';
 import { MINDMAP_NODE_BY_ID } from '../content/roadmapContent.js';
 import { setNav, setTabSub, engineApi } from '../state/nav.js';
 import { t, applyTranslations, onLangChange } from '../i18n/index.js';
+import { pulseElement, delay } from '../core/pulse.js';
+import { drawCoin, animateCoinFlip } from '../core/coin.js';
 import { isDark, BLOCH_COLORS, onThemeChange, refreshThemeColors } from '../core/theme.js';
 import { noiseT2Eff as noiseT2EffOf, noiseCompute as noiseComputeAt } from '../core/noise.js';
 import { interferenceIntensity as interferenceIntensityAt, interferenceMaxIntensity as interferenceMax } from '../core/interference.js';
@@ -63,141 +65,6 @@ function setExplainer(elId, html) {
     el.innerHTML = html;
     el.style.opacity = '1';
   });
-}
-
-// ─── GOLD COIN (qubit state visual) ────────────────────────────────────
-/* Draws a single qubit as an actual gold coin (radial-gradient body,
-   raised rim, reeded edge, a glare highlight) rather than a flat UI disc
-   — shared by the Entangle tab's two coins (tabs/entanglement-tab.js) and
-   the Measure tab's single coin (tabs/measure-tab.js). state:
-   null=superposition (faint overlapping 0/1 + "?"), 0 or 1 = collapsed/
-   measured. The coin body itself is theme-independent (real gold reads
-   the same in light or dark mode); only the engraved 0/1 digits still
-   follow the app's --zero/--one convention (canvas fillStyle can't read
-   CSS custom properties, so their resolved hex values are hardcoded here
-   per theme). `canvasId` also picks the aria-label's subject — 'coin1'/
-   'coin2' read as "Qubit A"/"Qubit B" (the Entangle tab's pair), anything
-   else reads as "The qubit" (the Measure tab's single coin). */
-function drawCoin(canvasId, state) {
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-
-  const who = canvasId === 'coin1' ? 'Qubit A' : canvasId === 'coin2' ? 'Qubit B' : 'The qubit';
-  canvas.setAttribute('aria-label',
-    state === null ? `${who}: unmeasured, in superposition.` : `${who}: measured as |${state}⟩.`);
-
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width, h = canvas.height;
-  const cx = w / 2, cy = h / 2;
-  const r  = Math.min(w, h) / 2 - 6;
-
-  ctx.clearRect(0, 0, w, h);
-
-  // ── Gold coin body ── a radial gradient offset toward the upper-left
-  // (a consistent "light source"), bright gold highlight fading to a
-  // deeper amber edge.
-  const bodyGrad = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.35, r * 0.08, cx, cy, r);
-  bodyGrad.addColorStop(0,    '#FFEFB8');
-  bodyGrad.addColorStop(0.45, '#F4C430');
-  bodyGrad.addColorStop(1,    '#B8860B');
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-  ctx.fillStyle = bodyGrad;
-  ctx.fill();
-
-  // Raised rim — two concentric strokes, mimicking a real coin's milled edge.
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = '#8B6508';
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.arc(cx, cy, r - 5, 0, 2 * Math.PI);
-  ctx.lineWidth = 1;
-  ctx.strokeStyle = 'rgba(139,101,8,0.55)';
-  ctx.stroke();
-
-  // Reeded edge — short radial ticks around the circumference, like the
-  // ridged side of a real coin.
-  ctx.strokeStyle = 'rgba(139,101,8,0.4)';
-  ctx.lineWidth = 1;
-  const tickCount = 36;
-  for (let i = 0; i < tickCount; i++) {
-    const a  = (i / tickCount) * 2 * Math.PI;
-    const x1 = cx + Math.cos(a) * (r - 1),   y1 = cy + Math.sin(a) * (r - 1);
-    const x2 = cx + Math.cos(a) * (r - 4.5), y2 = cy + Math.sin(a) * (r - 4.5);
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
-  }
-
-  // Glare — a soft bright ellipse near the light source, for a metallic sheen.
-  ctx.save();
-  ctx.beginPath();
-  ctx.ellipse(cx - r * 0.32, cy - r * 0.38, r * 0.42, r * 0.22, -0.5, 0, 2 * Math.PI);
-  ctx.fillStyle = 'rgba(255,255,255,0.35)';
-  ctx.fill();
-  ctx.restore();
-
-  // ── Engraved content — a faint dark offset "shadow" under the digit
-  // gives it a stamped-into-metal look instead of sitting flat on top.
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  const engrave = (ch, x, y, size, alpha = 1) => {
-    ctx.save();
-    ctx.globalAlpha = alpha * 0.35;
-    ctx.fillStyle = '#5C3D00';
-    ctx.font = `bold ${size}px 'JetBrains Mono', monospace`;
-    ctx.fillText(ch, x + 1, y + 1.5);
-    ctx.restore();
-  };
-
-  if (state === null) {
-    // Superposition — faint overlapping 0 and 1
-    const size = r * 0.52;
-    engrave('0', cx - r * 0.14, cy, size, 0.5);
-    ctx.save();
-    ctx.globalAlpha = 0.35;
-    ctx.font = `bold ${size}px 'JetBrains Mono', monospace`;
-    ctx.fillStyle = isDark ? '#5B8DEF' : '#0033A0';
-    ctx.fillText('0', cx - r * 0.14, cy);
-    ctx.restore();
-
-    engrave('1', cx + r * 0.14, cy, size, 0.5);
-    ctx.save();
-    ctx.globalAlpha = 0.35;
-    ctx.font = `bold ${size}px 'JetBrains Mono', monospace`;
-    ctx.fillStyle = isDark ? '#F472B6' : '#BE185D';
-    ctx.fillText('1', cx + r * 0.14, cy);
-    ctx.restore();
-
-    // "?" on top
-    ctx.font = `bold ${r * 0.5}px 'JetBrains Mono', monospace`;
-    ctx.fillStyle = 'rgba(92,61,0,0.55)';
-    ctx.fillText('?', cx, cy);
-  } else if (state === 0) {
-    const size = r * 0.62;
-    engrave('0', cx, cy, size);
-    ctx.font = `bold ${size}px 'JetBrains Mono', monospace`;
-    ctx.fillStyle = isDark ? '#5B8DEF' : '#0033A0';
-    ctx.fillText('0', cx, cy);
-  } else {
-    const size = r * 0.62;
-    engrave('1', cx, cy, size);
-    ctx.font = `bold ${size}px 'JetBrains Mono', monospace`;
-    ctx.fillStyle = isDark ? '#F472B6' : '#BE185D';
-    ctx.fillText('1', cx, cy);
-  }
-}
-
-/* Flip animation helper — rapidly alternates coin faces before landing,
-   so a "measurement" reads as an actual coin toss rather than an instant
-   snap — used by the Entangle tab (measureCoinA()) and the Measure tab
-   (doMeasure()). */
-async function animateCoinFlip(canvasId, flips = 10, intervalMs = 55) {
-  for (let i = 0; i < flips; i++) {
-    drawCoin(canvasId, i % 2);
-    await delay(intervalMs);
-  }
 }
 
 // ─── SHARED TOOLTIP (used by BlochRenderer.enableTooltips) ───────────
@@ -275,20 +142,6 @@ async function copyShareLink(params, btn) {
   setTimeout(() => { btn.textContent = original; }, 1400);
 }
 
-// ─── ONE-SHOT PULSE ANIMATION ─────────────────────────────────────────
-/* Adds `className` to `el` just long enough to play its CSS animation,
-   then removes it — forcing a reflow first so re-triggering the same
-   pulse on an element that's still mid-animation restarts it cleanly
-   instead of being a no-op (adding a class that's already present
-   doesn't restart a running CSS animation). Reused for gate-apply and
-   measurement-collapse pulses. */
-function pulseElement(el, className, duration = 450) {
-  if (!el) return;
-  el.classList.remove(className);
-  void el.offsetWidth;
-  el.classList.add(className);
-  setTimeout(() => el.classList.remove(className), duration);
-}
 
 // ─── GATE PALETTE ──────────────────────────────────────────────────────
 /**
@@ -398,7 +251,6 @@ function initModeGridThumbs() {
 // No dependencies. Used by several tabs/*.js async flows (call-time only).
 
 // ─── UTILITY ──────────────────────────────────────────────────────────
-function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 
 // ════════ js/tabs/important-concepts.js ════════
@@ -2805,200 +2657,6 @@ function buildAllClassicalGatesTruthTables(targetId) {
   });
   table.innerHTML = `<tr><th>${t('common.gate', 'Gate')}</th><th>${t('common.input', 'Input')}</th><th>${t('common.output', 'Output')}</th></tr>` +
     rows.map(r => `<tr><td style="font-weight:700;">${r.name}</td><td>${r.inputs}</td><td>${r.out}</td></tr>`).join('');
-}
-
-
-// ════════ js/tabs/measure-tab.js ════════
-// Depends on: core/dom-utils.js (setExplainer, drawCoin, animateCoinFlip —
-// the coin is shared with tabs/entanglement-tab.js), core/theme.js
-// (onThemeChange), core/tab-registry.js (registerTab), app.js state
-// (qubitMeasure, measureCounts, measureCoinState, measureCoinAnimating).
-
-// ═══════════════════════════════════════════════════════════════════
-// MEASURE TAB
-// ═══════════════════════════════════════════════════════════════════
-function initMeasureTab() {
-  document.getElementById('btn-measure').addEventListener('click', doMeasure);
-  document.getElementById('btn-reset-stats').addEventListener('click', resetStats);
-  document.querySelectorAll('#tab-measure .preset-btn').forEach(btn => {
-    const theta = parseFloat(btn.dataset.thetaMult) * Math.PI;
-    const phi   = parseFloat(btn.dataset.phiMult)   * Math.PI;
-    btn.addEventListener('click', () => setMeasureState(theta, phi));
-  });
-  document.querySelectorAll('[data-measure-n]').forEach(btn => {
-    const n = parseInt(btn.dataset.measureN, 10);
-    btn.addEventListener('click', () => measureMany(n));
-  });
-
-  const redrawCoin = () => drawCoin('coin-measure', measureCoinState);
-  drawCoin('coin-measure', measureCoinState);
-  // Same two reasons as the Entangle tab's own coins: a redraw is needed
-  // both on re-entering this tab and on a theme change, since draw()
-  // always reads the live isDark/coin state.
-  registerTab('measure', { onEnter: redrawCoin });
-  onThemeChange(redrawCoin);
-}
-
-const MEASURE_OPENERS = [
-  'The universe rolled its dice —',
-  'No more hedging —',
-  'The coin finally landed —',
-  'Asked, and answered —',
-  'The blur snapped into focus —'
-];
-
-function setMeasureState(theta, phi) {
-  qubitMeasure.setState(theta, phi);
-  measureCounts = { 0: 0, 1: 0 };
-  resetStats(); // also resets the coin to superposition — see resetStats() below
-  updateMeasureUI();
-  setExplainer('measure-explainer', 'Right now the qubit hasn\'t committed to anything — it genuinely holds both |0⟩ and |1⟩ at once, weighted by the bars on the left. Hit MEASURE and you\'re forcing it to answer a yes/no question it was actively avoiding.');
-}
-
-function updateMeasureUI() {
-  const p0 = qubitMeasure.prob0() * 100;
-  const p1 = qubitMeasure.prob1() * 100;
-  document.getElementById('formula-measure').textContent = qubitMeasure.getFormula();
-  document.getElementById('vbar0').style.height = p0 + '%';
-  document.getElementById('vbar1').style.height = p1 + '%';
-  document.getElementById('vpct0').textContent  = Math.round(p0) + '%';
-  document.getElementById('vpct1').textContent  = Math.round(p1) + '%';
-}
-
-/** MEASURE — the coin spins through both faces (genuinely undecided,
- *  same visual as the Entangle tab's coins) before landing on the
- *  outcome, rather than snapping to a result instantly; measureCoinState
- *  then holds that result until the next state change or Reset puts the
- *  coin back into superposition (see setMeasureState()/resetStats()). */
-async function doMeasure() {
-  if (measureCoinAnimating || measureBatchAnimating) return;
-  measureCoinAnimating = true;
-
-  const p0before = Math.round(qubitMeasure.prob0() * 100);
-  const p1before = Math.round(qubitMeasure.prob1() * 100);
-
-  document.getElementById('measure-result').textContent = '';
-  document.getElementById('coin-measure-label').textContent = t('measure.measuring', 'Measuring…');
-  document.getElementById('btn-measure').disabled = true;
-
-  await animateCoinFlip('coin-measure', 9, 55);
-
-  const result = qubitMeasure.measure();
-  measureCoinState = result;
-  measureCounts[result]++;
-
-  drawCoin('coin-measure', result);
-  pulseElement(document.getElementById('coin-measure'), 'collapsing');
-  document.getElementById('coin-measure-label').textContent = result === 0 ? '|0⟩' : '|1⟩';
-
-  const resEl = document.getElementById('measure-result');
-  resEl.style.color   = result === 0 ? 'var(--zero)' : 'var(--one)';
-  resEl.style.opacity = '1';
-  resEl.textContent   = result === 0 ? '|0⟩' : '|1⟩';
-  pulseElement(resEl, 'collapsing', 500);
-
-  // The bars themselves deliberately don't move — they show the fixed odds
-  // of the prepared state, not "the answer" — but a flash on whichever
-  // bar matched the outcome ties the abstract percentages to what just
-  // actually happened.
-  const winningTrack = document.getElementById(result === 0 ? 'vbar0' : 'vbar1').closest('.vbar-track');
-  winningTrack.style.color = result === 0 ? 'var(--zero)' : 'var(--one)';
-  pulseElement(winningTrack, 'collapsing', 600);
-  document.getElementById('btn-measure').disabled = false;
-  pulseElement(document.getElementById('btn-measure'), 'pulsing');
-
-  updateHistogram();
-
-  const opener = MEASURE_OPENERS[Math.floor(Math.random() * MEASURE_OPENERS.length)];
-  const color  = result === 0 ? 'var(--zero)' : 'var(--one)';
-  setExplainer('measure-explainer',
-    `${opener} <strong style="color:${color}">|${result}⟩</strong>. A split second ago the odds were ${p0before}% / ${p1before}%, and both were equally real possibilities — not "secretly already |${result}⟩ and we just didn't know." The click is what forced a choice; the superposition is gone for good. Want to see it happen again? You'll need to re-prepare the exact same state from scratch.`
-  );
-
-  measureCoinAnimating = false;
-}
-
-// A batch runs its n trials in MEASURE_BATCH_STEPS chunks rather than one
-// synchronous loop — with everything computed at once, .hist-bar's own
-// CSS transition (measure.css) only ever gets one old-value-to-new-value
-// jump to animate, which reads as snapping straight to the final split
-// instead of visibly converging toward it the way the app's other
-// repeated-random-event displays do (the Beam Splitter/Stern-Gerlach
-// "accumulating plate" mechanic — see js/tabs/beam-splitter-tab.js). This
-// keeps every trial genuine (still n real calls to qubitMeasure.measure(),
-// just paced), so ×1000 doesn't mean 1000 real DOM updates either.
-const MEASURE_BATCH_STEPS  = 10;
-const MEASURE_BATCH_STEP_MS = 130;
-
-async function measureMany(n) {
-  if (measureCoinAnimating || measureBatchAnimating) return;
-  measureBatchAnimating = true;
-  document.querySelectorAll('[data-measure-n]').forEach(b => b.disabled = true);
-  document.getElementById('btn-measure').disabled = true;
-  document.getElementById('btn-reset-stats').disabled = true;
-
-  const resEl = document.getElementById('measure-result');
-  resEl.style.color = 'var(--text2)';
-
-  const steps = Math.min(n, MEASURE_BATCH_STEPS);
-  const stepBase = Math.floor(n / steps);
-  let remainder  = n - stepBase * steps;
-
-  for (let s = 0; s < steps; s++) {
-    const stepCount = stepBase + (remainder > 0 ? 1 : 0);
-    if (remainder > 0) remainder--;
-    for (let i = 0; i < stepCount; i++) measureCounts[qubitMeasure.measure()]++;
-
-    const runningTotal = measureCounts[0] + measureCounts[1];
-    resEl.textContent = `${runningTotal} total`;
-    updateHistogram();
-    if (s < steps - 1) await delay(MEASURE_BATCH_STEP_MS);
-  }
-
-  const total = measureCounts[0] + measureCounts[1];
-  const p0 = Math.round((measureCounts[0] / total) * 100);
-  const p1 = Math.round((measureCounts[1] / total) * 100);
-  setExplainer('measure-explainer',
-    `Just sent ${n} identical, freshly-prepared qubits through the same measurement — think of it as asking ${n} exact copies of the same question. None of them talk to each other or "remember" the last answer; each collapses on its own. Across ${total} trials so far the split landed near ${p0}% / ${p1}%, and it'll keep creeping toward the true odds the more you run.`
-  );
-
-  document.querySelectorAll('[data-measure-n]').forEach(b => b.disabled = false);
-  document.getElementById('btn-measure').disabled = false;
-  document.getElementById('btn-reset-stats').disabled = false;
-  measureBatchAnimating = false;
-}
-
-function updateHistogram() {
-  const total = measureCounts[0] + measureCounts[1];
-  if (total === 0) return;
-  const p0 = (measureCounts[0] / total) * 100;
-  const p1 = (measureCounts[1] / total) * 100;
-  document.getElementById('hist0').style.height = p0 + '%';
-  document.getElementById('hist1').style.height = p1 + '%';
-  document.getElementById('hpct0').textContent  = Math.round(p0) + '%';
-  document.getElementById('hpct1').textContent  = Math.round(p1) + '%';
-  document.getElementById('trial-count').textContent = `· ${total} trials`;
-
-  const exp0 = Math.round(qubitMeasure.prob0() * 100);
-  const exp1 = Math.round(qubitMeasure.prob1() * 100);
-  document.getElementById('convergence-note').textContent =
-    total >= 20 ? `Quantum prediction: |0⟩ → ${exp0}%  |1⟩ → ${exp1}%` : '';
-}
-
-function resetStats() {
-  if (measureCoinAnimating || measureBatchAnimating) return;
-  measureCounts = { 0: 0, 1: 0 };
-  ['hist0','hist1'].forEach(id => document.getElementById(id).style.height = '0%');
-  document.getElementById('hpct0').textContent          = '—';
-  document.getElementById('hpct1').textContent          = '—';
-  document.getElementById('trial-count').textContent    = '';
-  document.getElementById('measure-result').textContent = '';
-  document.getElementById('convergence-note').textContent = '';
-  // Back to superposition — matches "Reset" conceptually undoing the last
-  // collapse, not just clearing the histogram.
-  measureCoinState = null;
-  drawCoin('coin-measure', null);
-  document.getElementById('coin-measure-label').textContent = t('measure.unmeasured', 'Unmeasured');
 }
 
 
@@ -5632,7 +5290,6 @@ function endTour() {
 // ═══════════════════════════════════════════════════════════════════
 let qubitMain    = new Qubit();
 let qubitCircuit = new Qubit();
-let qubitMeasure = new Qubit();
 
 // Two Qubits panel (Qubit tab) — independent, not entangled; see
 // updateQubit2UI() in qubit-tab.js for the product-state math.
@@ -5682,14 +5339,10 @@ let gateHistory  = [];
 let circuitGates = [];
 const SLOT_COUNT = 8;
 
-let measureCounts = { 0: 0, 1: 0 };
 // The Measure tab's coin — same null=unmeasured/0/1 convention as the
 // Entangle tab's coin1State/coin2State below, and the same coinAnimating-
 // style re-entrancy guard so a rapid double-click on MEASURE can't start
 // a second flip animation mid-flight.
-let measureCoinState     = null;
-let measureCoinAnimating = false;
-let measureBatchAnimating = false; // guards measureMany() — see measure-tab.js
 
 let currentTab = 'qubit'; // matches the initially-active .tab/.tab-content in index.html
 
@@ -5865,7 +5518,6 @@ export function startEngine() {
   initCircuit3Tab();
   initClassicalCircuitTab();
   initClassicalGatesTab();
-  initMeasureTab();
   initStatevecTab();
   initEntangle();
   initBellStatesTab();
@@ -5899,7 +5551,6 @@ export function startEngine() {
   updateQubitUI();
   updateGatesUI();
   updateCircuitUI();
-  updateMeasureUI();
   updateClassicalUI();
   setAppMode('roadmap'); // Roadmap is the default landing view — see index.html's
                           // matching hardcoded defaults (nav hidden, #roadmap-view
