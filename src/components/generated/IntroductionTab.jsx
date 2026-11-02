@@ -1,4 +1,5 @@
-// Generated from the original index.html markup; edit freely.
+import IntroLearningPath from '../IntroLearningPath.jsx';
+
 export default function IntroductionTab() {
   return (
     <section id="tab-introduction" className="tab-content">
@@ -101,7 +102,7 @@ export default function IntroductionTab() {
             <div className="section-label" style={{margin: "22px 0 12px"}} data-i18n="intro.suggestedPath">
               Suggested learning path
             </div>
-            <div className="intro-path" id="intro-learning-path" />
+            <IntroLearningPath />
           </div>
         </div>
       </div>

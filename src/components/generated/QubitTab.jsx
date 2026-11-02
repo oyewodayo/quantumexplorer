@@ -1,4 +1,5 @@
-// Generated from the original index.html markup; edit freely.
+import LessonEmbed from '../LessonEmbed.jsx';
+
 export default function QubitTab() {
   return (
     <section id="tab-qubit" className="tab-content active" style={{display: "none"}}>
@@ -591,7 +592,7 @@ export default function QubitTab() {
           </div>
         </div>
       </div>
-      <div className="lesson-embed" id="lesson-embed-qubit" />
+      <LessonEmbed id="qubit" />
     </section>
   );
 }

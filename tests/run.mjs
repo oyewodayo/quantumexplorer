@@ -24,6 +24,8 @@ import { TwoQubitState } from '../src/core/twoQubit.js';
 import { ThreeQubitState } from '../src/core/threeQubit.js';
 import { noiseCompute, noiseT2Eff } from '../src/core/noise.js';
 import { interferenceIntensity, interferenceMaxIntensity } from '../src/core/interference.js';
+import { layoutMindmap } from '../src/core/mindmapLayout.js';
+import { MINDMAP_TREE, ROADMAP_LESSONS, ROADMAP_QUIZ } from '../src/content/roadmapContent.js';
 import { TunnelSolver, TUNNEL_N } from '../src/core/tunnelSolver.js';
 
 
@@ -459,6 +461,24 @@ check('Interference: coherent intensity spans [0,4]; single and which-path are f
   assert.strictEqual(interferenceIntensity(50, geo, 'single', 6), 1);
   assert.strictEqual(interferenceIntensity(50, geo, 'which-path', 6), 2);
   assert.deepStrictEqual(['single', 'which-path', 'coherent'].map(interferenceMaxIntensity), [1, 2, 4]);
+});
+
+// ── Home concept map layout and content ─────────────────────────────
+check('Concept map: every top-level concept is placed, and expanding a branch adds its children', () => {
+  const collapsed = layoutMindmap({ w: 1000, h: 540, expanded: new Set() });
+  assert.strictEqual(collapsed.nodes.length, MINDMAP_TREE.length);
+  const open = layoutMindmap({ w: 1000, h: 540, expanded: new Set(['qubit']) });
+  assert.strictEqual(open.nodes.length, MINDMAP_TREE.length + 2);
+  const rows = collapsed.nodes.filter((n) => n.x < collapsed.cx).map((n) => n.y).sort((a, b) => a - b);
+  for (let i = 1; i < rows.length; i++) assert.ok(rows[i] - rows[i - 1] >= 20, 'left column rows overlap');
+});
+
+check('Lessons: each quiz points at a real lesson and a valid correct option', () => {
+  const ids = new Set(ROADMAP_LESSONS.map((l) => l.id));
+  for (const q of ROADMAP_QUIZ) {
+    assert.ok(ids.has(q.lessonId), 'quiz for unknown lesson ' + q.lessonId);
+    assert.ok(q.correct >= 0 && q.correct < q.options.length, 'bad correct index for ' + q.lessonId);
+  }
 });
 
 console.log(`\n${passed} check(s) passed.`);

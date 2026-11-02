@@ -1,4 +1,5 @@
-// Generated from the original index.html markup; edit freely.
+import LessonEmbed from '../LessonEmbed.jsx';
+
 export default function CircuitTab() {
   return (
     <section id="tab-circuit" className="tab-content">
@@ -451,7 +452,7 @@ export default function CircuitTab() {
           </div>
         </div>
       </div>
-      <div className="lesson-embed" id="lesson-embed-circuit" />
+      <LessonEmbed id="circuit" />
     </section>
   );
 }

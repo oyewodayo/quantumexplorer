@@ -18,7 +18,7 @@ import TeleportTab from './components/generated/TeleportTab.jsx';
 import SuperdenseTab from './components/generated/SuperdenseTab.jsx';
 import NoiseTab from './components/generated/NoiseTab.jsx';
 import GroverTab from './components/generated/GroverTab.jsx';
-import RoadmapViewMarkup from './components/generated/RoadmapViewMarkup.jsx';
+import RoadmapView from './components/RoadmapView.jsx';
 import AppFooter from './components/AppFooter.jsx';
 import { startEngine } from './engine/engine.js';
 import { initI18n } from './i18n/index.js';
@@ -49,7 +49,7 @@ export default function App() {
       <SuperdenseTab />
       <NoiseTab />
       <GroverTab />
-      <RoadmapViewMarkup />
+      <RoadmapView />
       <AppFooter />
     </>
   );

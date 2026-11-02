@@ -1,4 +1,5 @@
-// Generated from the original index.html markup; edit freely.
+import LessonEmbed from '../LessonEmbed.jsx';
+
 export default function BeamsplitterTab() {
   return (
     <section id="tab-beamsplitter" className="tab-content">
@@ -157,7 +158,7 @@ export default function BeamsplitterTab() {
           </div>
         </div>
       </div>
-      <div className="lesson-embed" id="lesson-embed-beamsplitter" />
+      <LessonEmbed id="beamsplitter" />
     </section>
   );
 }

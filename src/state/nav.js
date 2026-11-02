@@ -29,4 +29,11 @@ export function setTabSub(tab, subState) {
 }
 
 // Functions the engine registers so React can drive it.
-export const engineApi = { switchToTab() {}, applySub() {} };
+export const engineApi = {
+  switchToTab() {},
+  applySub() {},
+  setAppMode() {},
+  goToNode() {},
+  showTooltip() {},
+  hideTooltip() {},
+};

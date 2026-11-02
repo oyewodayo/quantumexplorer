@@ -1,4 +1,5 @@
-// Generated from the original index.html markup; edit freely.
+import LessonEmbed from '../LessonEmbed.jsx';
+
 export default function GatesTab() {
   return (
     <section id="tab-gates" className="tab-content">
@@ -227,7 +228,7 @@ export default function GatesTab() {
           </p>
         </div>
       </div>
-      <div className="lesson-embed" id="lesson-embed-gates" />
+      <LessonEmbed id="gates" />
     </section>
   );
 }

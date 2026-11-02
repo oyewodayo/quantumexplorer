@@ -1,4 +1,5 @@
-// Generated from the original index.html markup; edit freely.
+import LessonEmbed from '../LessonEmbed.jsx';
+
 export default function BellstatesTab() {
   return (
     <section id="tab-bellstates" className="tab-content">
@@ -240,7 +241,7 @@ export default function BellstatesTab() {
           </p>
         </div>
       </div>
-      <div className="lesson-embed" id="lesson-embed-bellstates" />
+      <LessonEmbed id="bellstates" />
     </section>
   );
 }

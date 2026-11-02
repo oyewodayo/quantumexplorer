@@ -1,15 +1,27 @@
-import { memo } from 'react';
 import { useI18n } from '../hooks/useI18n.js';
 import { useTheme } from '../hooks/useTheme.js';
+import { useNav } from '../hooks/useNav.js';
+import { useProgress } from '../hooks/useProgress.js';
+import { engineApi } from '../state/nav.js';
+import { ROADMAP_LESSONS } from '../content/roadmapContent.js';
 import { LANGUAGES } from '../i18n/index.js';
 
-// The Home / Concepts toggle is still driven by the simulation engine, which
-// rewrites its label with live progress, so React must never re-render it.
-const HomeButton = memo(function HomeButton() {
+// Home toggle, showing live progress (e.g. "Home · 3/20").
+function HomeButton() {
+  const { t } = useI18n();
+  const nav = useNav();
+  const { completedLessons } = useProgress();
   return (
-    <button className="preset-btn mode-btn active" data-app-mode="roadmap" id="btn-roadmap-toggle">Home</button>
+    <button
+      className={`preset-btn mode-btn${nav.mode === 'roadmap' ? ' active' : ''}`}
+      id="btn-roadmap-toggle"
+      onClick={() => engineApi.setAppMode('roadmap')}
+    >
+      {t('nav.home', 'Home')}
+      <span className="roadmap-badge-count"> · {completedLessons.length}/{ROADMAP_LESSONS.length}</span>
+    </button>
   );
-});
+}
 
 export default function AppHeader() {
   const { t, lang, setLanguage } = useI18n();

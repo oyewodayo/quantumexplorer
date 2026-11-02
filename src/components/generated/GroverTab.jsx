@@ -1,4 +1,5 @@
-// Generated from the original index.html markup; edit freely.
+import LessonEmbed from '../LessonEmbed.jsx';
+
 export default function GroverTab() {
   return (
     <section id="tab-grover" className="tab-content">
@@ -558,7 +559,7 @@ export default function GroverTab() {
           </p>
         </div>
       </div>
-      <div className="lesson-embed" id="lesson-embed-grover" />
+      <LessonEmbed id="grover" />
     </section>
   );
 }

@@ -1,4 +1,5 @@
-// Generated from the original index.html markup; edit freely.
+import LessonEmbed from '../LessonEmbed.jsx';
+
 export default function NoiseTab() {
   return (
     <section id="tab-noise" className="tab-content">
@@ -201,7 +202,7 @@ export default function NoiseTab() {
           </p>
         </div>
       </div>
-      <div className="lesson-embed" id="lesson-embed-noise" />
+      <LessonEmbed id="noise" />
     </section>
   );
 }

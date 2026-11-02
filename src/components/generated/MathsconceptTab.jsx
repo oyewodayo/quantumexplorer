@@ -1,4 +1,5 @@
-// Generated from the original index.html markup; edit freely.
+import LessonEmbed from '../LessonEmbed.jsx';
+
 export default function MathsconceptTab() {
   return (
     <section id="tab-mathsconcept" className="tab-content">
@@ -36,7 +37,7 @@ export default function MathsconceptTab() {
               A qubit state α|0⟩ + β|1⟩ has complex amplitudes α, β. Only their squared moduli |α|², |β|² are directly observable (as measurement probabilities) — the relative phase between them is invisible to a single measurement but drives interference.
             </p>
           </div>
-          <div className="lesson-embed" id="lesson-embed-maths-complex" />
+          <LessonEmbed id="maths-complex" />
         </div>
         <div className="maths-panel" id="maths-vectors" style={{display: "none"}}>
           <div className="card">
@@ -87,7 +88,7 @@ export default function MathsconceptTab() {
               Normalization keeps total probability at 100% — it's why every point you can drag to on the Bloch sphere is automatically a valid state. The inner product measures how much two states overlap; orthogonal states (like |0⟩ and |1⟩) have inner product 0.
             </p>
           </div>
-          <div className="lesson-embed" id="lesson-embed-maths-vectors" />
+          <LessonEmbed id="maths-vectors" />
         </div>
         <div className="maths-panel" id="maths-matrices" style={{display: "none"}}>
           <div className="card">
@@ -118,7 +119,7 @@ export default function MathsconceptTab() {
               "Unitary" is the constraint every quantum gate must satisfy — U† (the conjugate transpose) undoes U exactly. It's what guarantees a gate never destroys or creates probability: the output state is always normalized whenever the input was.
             </p>
           </div>
-          <div className="lesson-embed" id="lesson-embed-maths-matrices" />
+          <LessonEmbed id="maths-matrices" />
         </div>
         <div className="maths-panel" id="maths-statevector" style={{display: "none"}}>
           <div className="card">
@@ -267,7 +268,7 @@ export default function MathsconceptTab() {
               </div>
             </div>
           </div>
-          <div className="lesson-embed" id="lesson-embed-maths-statevector" />
+          <LessonEmbed id="maths-statevector" />
         </div>
         <div className="maths-panel" id="maths-dirac" style={{display: "none"}}>
           <div className="card">
@@ -296,7 +297,7 @@ export default function MathsconceptTab() {
               |0⟩ and |1⟩ are orthonormal — each has unit length and zero overlap with the other — which is exactly why measuring always returns a clean 0 or 1, never something in between.
             </p>
           </div>
-          <div className="lesson-embed" id="lesson-embed-maths-dirac" />
+          <LessonEmbed id="maths-dirac" />
         </div>
         <div className="maths-panel" id="maths-tensor" style={{display: "none"}}>
           <div className="card">
@@ -342,7 +343,7 @@ export default function MathsconceptTab() {
               Every state built by tensoring two single-qubit states can always be factored back apart into those same two qubits. Not every 4-entry vector can be factored that way, though — a joint state that can't be split back into a tensor product of two single-qubit states is exactly what's called entangled, explored hands-on on the Entangle tab.
             </p>
           </div>
-          <div className="lesson-embed" id="lesson-embed-maths-tensor" />
+          <LessonEmbed id="maths-tensor" />
         </div>
       </div>
     </section>

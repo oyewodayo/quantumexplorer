@@ -1,4 +1,5 @@
-// Generated from the original index.html markup; edit freely.
+import LessonEmbed from '../LessonEmbed.jsx';
+
 export default function EntangleTab() {
   return (
     <section id="tab-entangle" className="tab-content">
@@ -255,7 +256,7 @@ export default function EntangleTab() {
           </p>
         </div>
       </div>
-      <div className="lesson-embed" id="lesson-embed-entangle" />
+      <LessonEmbed id="entangle" />
     </section>
   );
 }

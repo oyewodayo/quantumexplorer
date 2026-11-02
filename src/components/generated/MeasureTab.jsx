@@ -1,4 +1,5 @@
-// Generated from the original index.html markup; edit freely.
+import LessonEmbed from '../LessonEmbed.jsx';
+
 export default function MeasureTab() {
   return (
     <section id="tab-measure" className="tab-content">
@@ -144,7 +145,7 @@ export default function MeasureTab() {
           </p>
         </div>
       </div>
-      <div className="lesson-embed" id="lesson-embed-measure" />
+      <LessonEmbed id="measure" />
     </section>
   );
 }

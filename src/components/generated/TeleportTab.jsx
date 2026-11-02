@@ -1,4 +1,5 @@
-// Generated from the original index.html markup; edit freely.
+import LessonEmbed from '../LessonEmbed.jsx';
+
 export default function TeleportTab() {
   return (
     <section id="tab-teleport" className="tab-content">
@@ -302,7 +303,7 @@ export default function TeleportTab() {
           </p>
         </div>
       </div>
-      <div className="lesson-embed" id="lesson-embed-teleport" />
+      <LessonEmbed id="teleport" />
     </section>
   );
 }

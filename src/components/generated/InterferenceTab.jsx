@@ -1,4 +1,5 @@
-// Generated from the original index.html markup; edit freely.
+import LessonEmbed from '../LessonEmbed.jsx';
+
 export default function InterferenceTab() {
   return (
     <section id="tab-interference" className="tab-content">
@@ -192,7 +193,7 @@ export default function InterferenceTab() {
           That's why the ripple animation on the left and the dot-by-dot screen on the right are shown side by side: the ripples are the continuous wave picture that predicts where the cross term is constructive or destructive, and the screen is what actually gets measured — one random, all-or-nothing click at a time. The wave never lands anywhere; only the particle does. The stripes are the wave's fingerprint on where the particles were and weren't allowed to click.
         </p>
       </div>
-      <div className="lesson-embed" id="lesson-embed-interference" />
+      <LessonEmbed id="interference" />
     </section>
   );
 }

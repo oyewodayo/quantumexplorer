@@ -1,4 +1,5 @@
-// Generated from the original index.html markup; edit freely.
+import LessonEmbed from '../LessonEmbed.jsx';
+
 export default function TunnelTab() {
   return (
     <section id="tab-tunnel" className="tab-content">
@@ -105,7 +106,7 @@ export default function TunnelTab() {
           </div>
         </div>
       </div>
-      <div className="lesson-embed" id="lesson-embed-tunnel" />
+      <LessonEmbed id="tunnel" />
     </section>
   );
 }
