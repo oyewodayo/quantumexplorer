@@ -22,6 +22,8 @@ import { Qubit } from '../src/core/qubit.js';
 import { GATES, rotationMatrix } from '../src/core/gates.js';
 import { TwoQubitState } from '../src/core/twoQubit.js';
 import { ThreeQubitState } from '../src/core/threeQubit.js';
+import { noiseCompute, noiseT2Eff } from '../src/core/noise.js';
+import { interferenceIntensity, interferenceMaxIntensity } from '../src/core/interference.js';
 import { TunnelSolver, TUNNEL_N } from '../src/core/tunnelSolver.js';
 
 
@@ -422,6 +424,38 @@ check('Tunnel transmission probability falls as the barrier grows relative to th
   assert.ok(atEqualEnergy > 0.1, `expected noticeable tunneling at V0=E, got ${(atEqualEnergy * 100).toFixed(1)}%`);
   assert.ok(atHigherEnergy < atEqualEnergy, `raising the barrier should reduce transmission: ${(atHigherEnergy*100).toFixed(2)}% vs ${(atEqualEnergy*100).toFixed(2)}%`);
   assert.ok(atHigherEnergy < 0.02, `expected transmission near-zero at V0=2.5E, got ${(atHigherEnergy * 100).toFixed(2)}%`);
+});
+
+// ── Noise (T1/T2 decay) ─────────────────────────────────────────────
+check('Noise: T2 is capped at 2*T1', () => {
+  assert.strictEqual(noiseT2Eff(40, 200), 80);
+  assert.strictEqual(noiseT2Eff(80, 60), 60);
+});
+
+check('Noise: equator state decays in x/y and z relaxes to +1', () => {
+  const p = { x0: 1, y0: 0, z0: 0, t1: 80, t2: 60 };
+  const start = noiseCompute(0, p);
+  approxEqual(start.x, 1, 1e-12, 'x at t=0');
+  approxEqual(start.z, 0, 1e-12, 'z at t=0');
+  const late = noiseCompute(2000, p);
+  approxEqual(late.x, 0, 1e-6, 'x at late time');
+  approxEqual(late.z, 1, 1e-6, 'z at late time');
+  approxEqual(noiseCompute(60, p).x, Math.exp(-1), 1e-12, 'x after one T2');
+});
+
+// ── Interference ────────────────────────────────────────────────────
+check('Interference: coherent intensity spans [0,4]; single and which-path are flat', () => {
+  const geo = { screenX: 400, sourceX: 100, y1: 90, y2: 110 };
+  let lo = Infinity, hi = -Infinity;
+  for (let y = 0; y < 200; y += 0.25) {
+    const v = interferenceIntensity(y, geo, 'coherent', 6);
+    lo = Math.min(lo, v); hi = Math.max(hi, v);
+  }
+  assert.ok(lo >= -1e-9 && hi <= 4 + 1e-9, 'range [' + lo + ', ' + hi + ']');
+  assert.ok(lo < 0.1 && hi > 3.9, 'fringes should reach near 0 and near 4');
+  assert.strictEqual(interferenceIntensity(50, geo, 'single', 6), 1);
+  assert.strictEqual(interferenceIntensity(50, geo, 'which-path', 6), 2);
+  assert.deepStrictEqual(['single', 'which-path', 'coherent'].map(interferenceMaxIntensity), [1, 2, 4]);
 });
 
 console.log(`\n${passed} check(s) passed.`);

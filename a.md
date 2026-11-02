@@ -12,7 +12,8 @@ Goal: replace `src/engine/engine.js` (about 12,000 lines of code that edits the 
 - [x] 1.0 Bundle the old scripts through Vite (`src/engine/engine.js`)
 - [x] 1.1 Move the quantum math into ES modules (`src/core/`: complex, gates, qubit, two-qubit, three-qubit) and point the tests at them
 - [x] 1.2 Move the tunnelling solver into `src/core/tunnelSolver.js` (tested)
-- [ ] 1.2b Move the remaining pure physics (noise decay, interference intensity, Grover, teleport and superdense logic) into `src/core/`
+- [~] 1.2b Remaining pure physics: noise decay and interference done (`src/core/noise.js`, `interference.js`, tested); Grover, teleport and superdense logic still tangled with the page code
+- [x] 1.2c Theme state and the Bloch renderer moved into ES modules (`src/core/theme.js`, `blochRenderer.js`)
 - [ ] 1.3 Shared React `BlochSphere` component
 - [ ] 1.4 Shared hooks: theme, language (i18n), tab routing, saved progress
 - [ ] 1.5 App shell in React: header, sidebar, footer, theme and language switchers
@@ -58,11 +59,11 @@ Goal: replace `src/engine/engine.js` (about 12,000 lines of code that edits the 
 
 ## 5. Quality and maintenance  `[ ]`
 
-- [ ] Put the project under git
+- [x] Put the project under git (github.com/oyewodayo/quantumexplorer)
 - [ ] Browser test that opens every tab and clicks through it
-- [ ] ESLint and Prettier
+- [~] ESLint done (`npm run lint`, catches undefined names); Prettier not yet
 - [ ] Remove leftover copies once nothing uses them
-- [ ] Fix the page title and README
+- [~] README updated; page title still mentions CERN in places
 
 ## 6. Product ideas  `[ ]`
 
