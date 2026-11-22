@@ -5,16 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f4f6f8" />
     <title>Quantum Explorer · Learn Quantum Computing Interactively</title>
-    <meta name="description" content="Quantum Explorer is a free interactive platform for learning quantum computing and quantum mechanics: Bloch sphere, qubits, gates, circuits, entanglement, teleportation, Grover search and more." />
+    <meta name="description" content="Free interactive platform for learning quantum computing and quantum mechanics: Bloch sphere, qubits, quantum gates, circuits, entanglement, teleportation, Grover search and more." />
+    <link rel="canonical" href="https://quantumexplorer.com/" />
     <meta name="robots" content="index, follow" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Quantum Explorer" />
+    <meta property="og:url" content="https://quantumexplorer.com/" />
     <meta property="og:title" content="Quantum Explorer · Learn Quantum Computing Interactively" />
-    <meta property="og:description" content="Quantum Explorer is a free interactive platform for learning quantum computing and quantum mechanics: Bloch sphere, qubits, gates, circuits, entanglement, teleportation, Grover search and more." />
-    <meta property="og:image" content="/icons/quantum-explorer.svg" />
+    <meta property="og:description" content="Free interactive platform for learning quantum computing and quantum mechanics: Bloch sphere, qubits, quantum gates, circuits, entanglement, teleportation, Grover search and more." />
+    <meta property="og:image" content="https://quantumexplorer.com/icons/quantum-explorer.svg" />
     <meta name="twitter:card" content="summary" />
     <script type="application/ld+json">
-      {"@context":"https://schema.org","@type":"LearningResource","name":"Quantum Explorer","description":"Quantum Explorer is a free interactive platform for learning quantum computing and quantum mechanics: Bloch sphere, qubits, gates, circuits, entanglement, teleportation, Grover search and more.","learningResourceType":"Interactive simulation","educationalLevel":"Beginner to intermediate","inLanguage":["en","fr","es"],"isAccessibleForFree":true,"teaches":["Qubits and the Bloch sphere","Quantum gates and circuits","Entanglement and Bell states","Quantum tunneling and interference","Quantum teleportation and superdense coding","Grover's search algorithm"]}
+      {"@context":"https://schema.org","@type":"LearningResource","name":"Quantum Explorer","url":"https://quantumexplorer.com/","description":"Free interactive platform for learning quantum computing and quantum mechanics: Bloch sphere, qubits, quantum gates, circuits, entanglement, teleportation, Grover search and more.","learningResourceType":"Interactive simulation","educationalLevel":"Beginner to intermediate","inLanguage":["en","fr","es"],"isAccessibleForFree":true,"teaches":["Qubits and the Bloch sphere","Quantum gates and circuits","Entanglement and Bell states","Quantum tunneling and interference","Quantum teleportation and superdense coding","Grover's search algorithm"]}
     </script>
     <link rel="icon" type="image/svg+xml" href="/icons/quantum-explorer.svg" />
     <script>
@@ -28,29 +30,33 @@
   </head>
   <body>
     <div id="root">
-      <main style="max-width:720px;margin:40px auto;padding:0 16px;font-family:system-ui,sans-serif">
+      <main style="max-width:760px;margin:40px auto;padding:0 16px;font-family:system-ui,sans-serif">
         <h1>Quantum Explorer</h1>
-        <p>Quantum Explorer is a free interactive platform for learning quantum computing and quantum mechanics: Bloch sphere, qubits, gates, circuits, entanglement, teleportation, Grover search and more.</p>
-        <ul>
-          <li><a href="/?tab=qubit">Bits &amp; Qubits</a></li>
-          <li><a href="/?tab=mathsconcept">Maths Concept</a></li>
-          <li><a href="/?tab=gates">Quantum Gates</a></li>
-          <li><a href="/?tab=circuit">Circuits</a></li>
-          <li><a href="/?tab=measure">Measurement</a></li>
-          <li><a href="/?tab=entangle">Entanglement</a></li>
-          <li><a href="/?tab=bellstates">Bell States</a></li>
-          <li><a href="/?tab=tunnel">Quantum Tunneling</a></li>
-          <li><a href="/?tab=interference">Interference</a></li>
-          <li><a href="/?tab=beamsplitter">Beam Splitter</a></li>
-          <li><a href="/?tab=sterngerlach">Stern–Gerlach Experiment</a></li>
-          <li><a href="/?tab=teleport">Quantum Teleportation</a></li>
-          <li><a href="/?tab=superdense">Superdense Coding</a></li>
-          <li><a href="/?tab=noise">Noise &amp; Decoherence</a></li>
-          <li><a href="/?tab=grover">Grover's Search</a></li>
-        </ul>
+        <p>Free interactive platform for learning quantum computing and quantum mechanics: Bloch sphere, qubits, quantum gates, circuits, entanglement, teleportation, Grover search and more.</p>
+        <nav aria-label="Quantum topics">
+          <ul>
+            <li><a href="/introduction">Introduction to Quantum Computing</a></li>
+            <li><a href="/important-concepts">Core Quantum Concepts</a></li>
+            <li><a href="/qubits-and-bloch-sphere">Bits, Qubits &amp; the Bloch Sphere</a></li>
+            <li><a href="/quantum-math">Quantum Computing Math</a></li>
+            <li><a href="/quantum-gates">Quantum Gates Simulator</a></li>
+            <li><a href="/quantum-circuits">Quantum Circuit Builder</a></li>
+            <li><a href="/quantum-measurement">Quantum Measurement</a></li>
+            <li><a href="/quantum-entanglement">Quantum Entanglement</a></li>
+            <li><a href="/bell-states">Bell States</a></li>
+            <li><a href="/quantum-tunneling">Quantum Tunneling</a></li>
+            <li><a href="/double-slit-interference">Double-Slit Interference</a></li>
+            <li><a href="/beam-splitter">Beam Splitter</a></li>
+            <li><a href="/stern-gerlach">Stern–Gerlach Experiment</a></li>
+            <li><a href="/quantum-teleportation">Quantum Teleportation</a></li>
+            <li><a href="/superdense-coding">Superdense Coding</a></li>
+            <li><a href="/noise-and-decoherence">Noise &amp; Decoherence</a></li>
+            <li><a href="/grovers-search">Grover's Search Algorithm</a></li>
+          </ul>
+        </nav>
         <noscript>Quantum Explorer needs JavaScript to run its interactive simulations.</noscript>
       </main>
     </div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

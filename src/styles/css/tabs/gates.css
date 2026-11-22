@@ -18,22 +18,28 @@
 }
 
 .gate-btn {
-  padding: 11px 7px 9px;
-  border-radius: var(--radius-sm);
-  border: 1px solid;
+  padding: 12px 9px 10px;
+  border-radius: 10px;
+  border: 1.5px solid color-mix(in srgb, currentColor 32%, var(--border));
   cursor: pointer;
   font-family: 'JetBrains Mono', monospace;
   font-size: var(--text-base);
-  font-weight: var(--fw-medium);
-  transition: transform 0.11s, box-shadow 0.11s;
-  background: var(--surface2) var(--sheen-metal);
+  font-weight: 600;
+  transition: transform 0.14s ease, box-shadow 0.16s ease, background 0.16s ease, border-color 0.16s ease;
+  background: color-mix(in srgb, currentColor 7%, var(--surface));
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
 }
-.gate-btn:hover { transform: scale(1.05); box-shadow: 0 0 10px color-mix(in srgb, currentColor 40%, transparent); }
-.gate-btn:active { transform: scale(0.97); }
+.gate-btn:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, currentColor 65%, transparent);
+  background: color-mix(in srgb, currentColor 13%, var(--surface));
+  box-shadow: 0 6px 16px color-mix(in srgb, currentColor 22%, transparent);
+}
+.gate-btn:active { transform: translateY(0) scale(0.98); }
 
 /* Brief tactile confirmation that a gate was actually applied — synced
    with a matching pulse on the Bloch sphere card (.bloch-wrap.pulsing
@@ -41,7 +47,7 @@
    action. */
 @keyframes gate-btn-pulse {
   0%   { transform: scale(1); }
-  35%  { transform: scale(1.14); box-shadow: 0 0 26px 2px currentColor; }
+  35%  { transform: scale(1.08); box-shadow: 0 0 22px 2px color-mix(in srgb, currentColor 45%, transparent); }
   100% { transform: scale(1); }
 }
 .gate-btn.pulsing { animation: gate-btn-pulse 0.42s ease-out; }
@@ -50,9 +56,11 @@
 }
 
 .gate-sub {
-  font-size: 0.66rem;
+  font-size: 0.7rem;
   font-family: 'Space Grotesk', sans-serif;
-  opacity: 0.6;
+  font-weight: 500;
+  color: var(--text2);
+  opacity: 0.92;
   letter-spacing: 0.01em;
 }
 
